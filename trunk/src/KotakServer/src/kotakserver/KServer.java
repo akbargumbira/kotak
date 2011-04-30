@@ -16,13 +16,13 @@ import java.util.logging.Logger;
  *
  * @author user
  */
-public class Server extends MyThread {
+public class KServer extends KThread {
 
     private Socket socket;
     private InputStream in;
     private OutputStream out;
 
-    public Server(Socket socket) {
+    public KServer(Socket socket) {
         this.socket = socket;
     }
 
@@ -46,7 +46,7 @@ public class Server extends MyThread {
             out.write("Hai".getBytes());
             
         } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
