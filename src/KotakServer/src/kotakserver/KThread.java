@@ -9,6 +9,6 @@ package kotakserver;
  *
  * @author user
  */
-public class MyThread extends Thread {
+public class KThread extends Thread {
 
 }
