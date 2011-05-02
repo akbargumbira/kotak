@@ -1,4 +1,4 @@
-package protocol;
+package com.kotak.transferprotocol;
 
 import com.google.gson.Gson;
 import java.io.IOException;
