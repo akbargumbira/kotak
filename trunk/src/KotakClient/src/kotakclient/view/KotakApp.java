@@ -6,6 +6,15 @@
 
 package kotakclient.view;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import kotakclient.Main;
+import kotakclient.model.AppData;
+
 /**
  *
  * @author user
@@ -31,7 +40,6 @@ public class KotakApp extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel = new javax.swing.JPanel();
         jTabbedPane = new javax.swing.JTabbedPane();
@@ -44,9 +52,16 @@ public class KotakApp extends javax.swing.JFrame {
         jPanelFolder = new javax.swing.JPanel();
         jTextFieldFolder = new javax.swing.JTextField();
         jButtonOpen = new javax.swing.JButton();
-        Setting = new javax.swing.JPanel();
-        jTextFieldURL = new javax.swing.JTextField();
+        jPanelServer = new javax.swing.JPanel();
         jButtonSave = new javax.swing.JButton();
+        jTextFieldURL = new javax.swing.JTextField();
+        jLabelPassword1 = new javax.swing.JLabel();
+        jLabelURL = new javax.swing.JLabel();
+        jTextFieldPort = new javax.swing.JTextField();
+        jPanelRevert = new javax.swing.JPanel();
+        jLabelEmail2 = new javax.swing.JLabel();
+        jTextFieldRevision = new javax.swing.JTextField();
+        jButtonRevert = new javax.swing.JButton();
         jMenuBar = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
@@ -61,6 +76,11 @@ public class KotakApp extends javax.swing.JFrame {
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setResizable(false);
         setUndecorated(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                KotakApp.this.windowClosed(evt);
+            }
+        });
 
         jLabelPassword.setText("password");
 
@@ -79,37 +99,34 @@ public class KotakApp extends javax.swing.JFrame {
         jPanelAccount.setLayout(jPanelAccountLayout);
         jPanelAccountLayout.setHorizontalGroup(
             jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAccountLayout.createSequentialGroup()
-                .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanelAccountLayout.createSequentialGroup()
-                        .addGap(47, 47, 47)
+            .addGroup(jPanelAccountLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAccountLayout.createSequentialGroup()
                         .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabelPassword)
-                            .addComponent(jLabelEmail))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
-                            .addComponent(jTextFieldEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)))
-                    .addGroup(jPanelAccountLayout.createSequentialGroup()
-                        .addGap(157, 157, 157)
-                        .addComponent(jButtonLoginLogout)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(173, 173, 173))
+                            .addComponent(jLabelEmail)
+                            .addComponent(jLabelPassword))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jTextFieldEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
+                            .addComponent(jPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)))
+                    .addComponent(jButtonLoginLogout, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
         );
         jPanelAccountLayout.setVerticalGroup(
             jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelAccountLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextFieldEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextFieldEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelPassword)
-                    .addComponent(jPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelPassword))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButtonLoginLogout)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(23, 23, 23))
         );
 
         jTabbedPane.addTab("Account", null, jPanelAccount, "Login or Logout");
@@ -141,12 +158,10 @@ public class KotakApp extends javax.swing.JFrame {
                 .addComponent(jTextFieldFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonOpen)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
 
         jTabbedPane.addTab("Working Folder", null, jPanelFolder, "Change Working Folder");
-
-        jTextFieldURL.setText("server address");
 
         jButtonSave.setText("Save");
         jButtonSave.addActionListener(new java.awt.event.ActionListener() {
@@ -155,30 +170,88 @@ public class KotakApp extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout SettingLayout = new javax.swing.GroupLayout(Setting);
-        Setting.setLayout(SettingLayout);
-        SettingLayout.setHorizontalGroup(
-            SettingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 290, Short.MAX_VALUE)
-            .addGroup(SettingLayout.createSequentialGroup()
+        jTextFieldURL.setText("server url");
+
+        jLabelPassword1.setText("Port");
+
+        jLabelURL.setText("URL");
+
+        jTextFieldPort.setText("server url");
+
+        javax.swing.GroupLayout jPanelServerLayout = new javax.swing.GroupLayout(jPanelServer);
+        jPanelServer.setLayout(jPanelServerLayout);
+        jPanelServerLayout.setHorizontalGroup(
+            jPanelServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelServerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(SettingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextFieldURL, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                .addGroup(jPanelServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelServerLayout.createSequentialGroup()
+                        .addGroup(jPanelServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelPassword1)
+                            .addComponent(jLabelURL))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jTextFieldURL, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+                            .addComponent(jTextFieldPort, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)))
                     .addComponent(jButtonSave, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
-        SettingLayout.setVerticalGroup(
-            SettingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 97, Short.MAX_VALUE)
-            .addGroup(SettingLayout.createSequentialGroup()
+        jPanelServerLayout.setVerticalGroup(
+            jPanelServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelServerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTextFieldURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanelServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelURL, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelServerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelPassword1)
+                    .addComponent(jTextFieldPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonSave)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
-        jTabbedPane.addTab("Setting", Setting);
+        jTabbedPane.addTab("Server", jPanelServer);
+
+        jLabelEmail2.setText("revision");
+
+        jTextFieldRevision.setText("revision number");
+
+        jButtonRevert.setText("Revert");
+        jButtonRevert.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRevertActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelRevertLayout = new javax.swing.GroupLayout(jPanelRevert);
+        jPanelRevert.setLayout(jPanelRevertLayout);
+        jPanelRevertLayout.setHorizontalGroup(
+            jPanelRevertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelRevertLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelRevertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelRevertLayout.createSequentialGroup()
+                        .addComponent(jLabelEmail2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jTextFieldRevision, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE))
+                    .addComponent(jButtonRevert, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
+        );
+        jPanelRevertLayout.setVerticalGroup(
+            jPanelRevertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelRevertLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelRevertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelEmail2, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldRevision, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonRevert)
+                .addContainerGap(49, Short.MAX_VALUE))
+        );
+
+        jTabbedPane.addTab("Revert", jPanelRevert);
 
         javax.swing.GroupLayout jPanelLayout = new javax.swing.GroupLayout(jPanel);
         jPanel.setLayout(jPanelLayout);
@@ -188,7 +261,7 @@ public class KotakApp extends javax.swing.JFrame {
         );
         jPanelLayout.setVerticalGroup(
             jPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
+            .addComponent(jTabbedPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
         );
 
         jMenuBar.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -242,33 +315,69 @@ public class KotakApp extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void renderLoginLogout() {
+        // Login / Logout
+        if (login) {
+            jTextFieldEmail.setEnabled(false);
+            jPasswordField.setEnabled(false);
+            jButtonLoginLogout.setText("Logout");
+        } else {
+            jTextFieldEmail.setEnabled(true);
+            jPasswordField.setEnabled(true);
+            jButtonLoginLogout.setText("Login");
+        }
+    }
+
     private void login() {
-        // TODO Login
         boolean success = false;
 
         // Get username
+        String email = jTextFieldEmail.getText();
 
         // Get password
+        String password = new String(jPasswordField.getPassword());
 
+        // TODO Login
         // Connect to Server
+        
         success = true;
         
         if (success) {
-            // login is true
+            // Login is true
             login = true;
 
-            // Set button text to Logout
-            jButtonLoginLogout.setText("Logout");
+            // Render
+            renderLoginLogout();
+
+            // Save Data
+            saveAccountData();
+        } else {
+            JOptionPane.showMessageDialog(this, "email and password don't match.", "Login Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void logout() {
-        // TODO Logout
-        // login is false
+        // Login is false
         login = false;
         
-        // Set button text to Logout
-        jButtonLoginLogout.setText("Login");
+        // Render
+        renderLoginLogout();
+
+        // Save Data
+        saveAccountData();
+    }
+
+    private void saveAccountData() {
+        AppData.instance.setLogin(login);
+        AppData.instance.setUsername(jTextFieldEmail.getText());
+        AppData.instance.setPassword(new String(jPasswordField.getPassword()));
+        try {
+            AppData.save(AppData.instance);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void windowDrag(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_windowDrag
@@ -302,40 +411,77 @@ public class KotakApp extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonLoginLogoutActionPerformed
 
     private void jButtonOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOpenActionPerformed
-        // TODO Open Working Folder
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-        // Open JFileChooser
-
-        // If key of OK is pressed
-
+        if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             // Get New Folder Path
+            String newPath = jfc.getSelectedFile().getAbsolutePath();
 
             // Set new Folder Path
+            AppData.instance.setWorkingFolder(newPath);
+            jTextFieldFolder.setText(newPath);
+
+            // Save
+            try {
+                AppData.save(AppData.instance);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_jButtonOpenActionPerformed
 
     private void jButtonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveActionPerformed
-        // TODO Save server URL
-        
+        // Get URL & port from text field
+        String newURL = jTextFieldURL.getText();
+        String newPort = jTextFieldPort.getText();
+
+        // Set to AppData
+        AppData.instance.setServerURL(newURL);
+        AppData.instance.setServerPort(Integer.parseInt(newPort));
+
+        // Save
+        try {
+            AppData.save(AppData.instance);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButtonSaveActionPerformed
+
+    private void jButtonRevertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRevertActionPerformed
+        // TODO Revert / List Repo
+    }//GEN-LAST:event_jButtonRevertActionPerformed
+
+    private void windowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_windowClosed
+        Main.daemon.close();
+        System.out.println("closed");
+    }//GEN-LAST:event_windowClosed
 
     /**
     * @param args the command line arguments
     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new KotakApp().setVisible(true);
-            }
-        });
-    }
+//    public static void main(String args[]) {
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                new KotakApp().setVisible(true);
+//            }
+//        });
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel Setting;
     private javax.swing.JButton jButtonLoginLogout;
     private javax.swing.JButton jButtonOpen;
+    private javax.swing.JButton jButtonRevert;
     private javax.swing.JButton jButtonSave;
     private javax.swing.JLabel jLabelEmail;
+    private javax.swing.JLabel jLabelEmail2;
     private javax.swing.JLabel jLabelPassword;
+    private javax.swing.JLabel jLabelPassword1;
+    private javax.swing.JLabel jLabelURL;
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
@@ -344,12 +490,27 @@ public class KotakApp extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel;
     private javax.swing.JPanel jPanelAccount;
     private javax.swing.JPanel jPanelFolder;
+    private javax.swing.JPanel jPanelRevert;
+    private javax.swing.JPanel jPanelServer;
     private javax.swing.JPasswordField jPasswordField;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JTextField jTextFieldEmail;
     private javax.swing.JTextField jTextFieldFolder;
+    private javax.swing.JTextField jTextFieldPort;
+    private javax.swing.JTextField jTextFieldRevision;
     private javax.swing.JTextField jTextFieldURL;
     // End of variables declaration//GEN-END:variables
+
+    public void init() {
+        jTextFieldFolder.setText(AppData.instance.getWorkingFolder());
+        jTextFieldURL.setText(AppData.instance.getServerURL());
+        jTextFieldPort.setText(String.valueOf(AppData.instance.getServerPort()));
+        jTextFieldEmail.setText(AppData.instance.getEmail());
+        jPasswordField.setText(AppData.instance.getPassword());
+        login = AppData.instance.isLogin();
+
+        renderLoginLogout();
+    }
 
 }
