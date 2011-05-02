@@ -315,7 +315,7 @@ public class KotakApp extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void renderLoginLogout() {
+    private void renderAccount() {
         // Login / Logout
         if (login) {
             jTextFieldEmail.setEnabled(false);
@@ -347,7 +347,7 @@ public class KotakApp extends javax.swing.JFrame {
             login = true;
 
             // Render
-            renderLoginLogout();
+            renderAccount();
 
             // Save Data
             saveAccountData();
@@ -361,7 +361,7 @@ public class KotakApp extends javax.swing.JFrame {
         login = false;
         
         // Render
-        renderLoginLogout();
+        renderAccount();
 
         // Save Data
         saveAccountData();
@@ -411,12 +411,17 @@ public class KotakApp extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonLoginLogoutActionPerformed
 
     private void jButtonOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOpenActionPerformed
+        String oldPath = jTextFieldFolder.getText();
+                
         JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             // Get New Folder Path
             String newPath = jfc.getSelectedFile().getAbsolutePath();
+
+            // Move 'Kotak' to new path
+            
 
             // Set new Folder Path
             AppData.instance.setWorkingFolder(newPath);
@@ -510,7 +515,8 @@ public class KotakApp extends javax.swing.JFrame {
         jPasswordField.setText(AppData.instance.getPassword());
         login = AppData.instance.isLogin();
 
-        renderLoginLogout();
+        // Render panel accout
+        renderAccount();
     }
 
 }
