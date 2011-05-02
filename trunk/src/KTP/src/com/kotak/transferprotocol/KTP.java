@@ -1,4 +1,4 @@
-package protocol;
+package com.kotak.transferprotocol;
 
 import java.io.InputStream;
 import java.io.OutputStream;
