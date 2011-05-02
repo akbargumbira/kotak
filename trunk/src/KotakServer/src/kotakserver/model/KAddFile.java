@@ -1,19 +1,18 @@
 package kotakserver.model;
 
-import java.net.Socket;
-
 /**
  *
  * @author user
  */
 public class KAddFile extends KMessage {
 
-    public KAddFile(Socket socket) {
-        super(socket);
+    public KAddFile(String request) {
+        super(request);
     }
 
     @Override
-    public boolean  run() {
+    public String  run() {
+        response = "failed";
         // TODO AddFile
 
         // Menerima pesan : addfile [repository] [last_revision] [path] [content]#
@@ -55,7 +54,7 @@ public class KAddFile extends KMessage {
                 // kirim pesan : success [last_revision]
         // Unlock repository
 
-        return true;
+        return response;
     }
 
 }

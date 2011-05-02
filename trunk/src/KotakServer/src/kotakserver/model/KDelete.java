@@ -1,19 +1,19 @@
 package kotakserver.model;
 
-import java.net.Socket;
-
 /**
  *
  * @author user
  */
 public class KDelete extends KMessage {
 
-    public KDelete(Socket socket) {
-        super(socket);
+    public KDelete(String request) {
+        super(request);
     }
 
     @Override
-    public boolean  run() {
+    public String  run() {
+        response = "failed";
+        
         // TODO Run
 
         // Menerima pesan delete [email] [pass] [repository] [path] [last_revision]
@@ -54,7 +54,7 @@ public class KDelete extends KMessage {
             // kirim pesan : success [last_revision]
         // Unlock repository
 
-        return true;
+        return response;
     }
 
 }

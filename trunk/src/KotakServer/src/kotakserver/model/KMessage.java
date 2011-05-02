@@ -1,29 +1,16 @@
 package kotakserver.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author user
  */
 public abstract class KMessage {
-    protected InputStream in;
-    protected OutputStream out;
-    protected Socket socket;
+    protected String request;
+    protected String response;
 
-    public KMessage(Socket socket) {
-        try {
-            this.in = socket.getInputStream();
-            this.out = socket.getOutputStream();
-        } catch (IOException ex) {
-            Logger.getLogger(KMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public KMessage(String request) {
+        this.request = request;
     }
 
-    public abstract boolean  run();
+    public abstract String  run();
 }

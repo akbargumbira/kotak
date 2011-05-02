@@ -6,6 +6,7 @@
 package kotakserver;
 
 import com.google.gson.Gson;
+import com.kotak.transferprotocol.KTPServer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -45,7 +46,7 @@ public class Main {
                 Socket socket = ss.accept();
 
                 // There is a connection, serve it!
-                (new KServer(socket)).start();
+                (new Child(new KTPServer(socket))).start();
             }
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
