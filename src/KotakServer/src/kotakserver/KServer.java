@@ -37,13 +37,9 @@ public class KServer extends KThread {
             // Get OutputStream
             out = socket.getOutputStream();
 
-            // Just Test :p
-            int temp;
-            while((temp = in.read()) > -1) {
-                System.out.print((char)temp);
+            while(socket.isConnected()) {
+                
             }
-
-            out.write("Hai".getBytes());
             
         } catch (IOException ex) {
             Logger.getLogger(KServer.class.getName()).log(Level.SEVERE, null, ex);

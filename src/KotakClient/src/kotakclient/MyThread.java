@@ -11,4 +11,9 @@ package kotakclient;
  */
 public class MyThread extends Thread {
 
+    protected boolean loop = true;
+
+    public void close() {
+        loop = false;
+    }
 }
