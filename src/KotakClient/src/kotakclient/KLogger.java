@@ -16,7 +16,7 @@ import java.util.logging.Level;
  *
  * @author user
  */
-public class TLogger {
+public class KLogger {
 
     public static String fileName = "log.txt";
     //public static
@@ -34,9 +34,9 @@ public class TLogger {
             System.out.println(string);
             
         } catch (FileNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TLogger.class.getName()).log(Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(KLogger.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(TLogger.class.getName()).log(Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(KLogger.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }
 }

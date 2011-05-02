@@ -40,7 +40,7 @@ public class Main {
             // Start Daemon
             daemon = new Daemon(AppData.instance.getEmail(), AppData.instance.getPassword());
             //daemon.start();
-            
+
         } catch (FileNotFoundException ex) {
             try {
                 AppData.instance = new AppData();

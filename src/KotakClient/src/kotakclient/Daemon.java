@@ -47,11 +47,11 @@ public class Daemon extends MyThread {
 
     private void syncRepository() {
         try {
-            TLogger.writeln("Waiting for connection from " + URL + ":" + port);
+            KLogger.writeln("Waiting for connection from " + URL + ":" + port);
             // Waiting for connection
             socket = new Socket(URL, port);
 
-            TLogger.writeln("Connection is established");
+            KLogger.writeln("Connection is established");
             // Connection is established
 
             // Get InputStream
