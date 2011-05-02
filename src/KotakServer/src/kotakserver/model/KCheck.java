@@ -5,23 +5,29 @@
 
 package kotakserver.model;
 
-import java.net.Socket;
-
 /**
  *
  * @author user
  */
 public class KCheck extends KMessage {
 
-    public KCheck(Socket socket) {
-        super(socket);
+    public KCheck(String request) {
+        super(request);
     }
 
     @Override
-    public boolean  run() {
+    public String  run() {
+        response = "failed";
         // TODO run
+        
         // Menerima pesan : check [email] [pass] [repository] [revision]
-
+        String[] part = request.split(" ");
+        
+        String email = part[1];
+        String pass = part[2];
+        String repository = part[3];
+        String revision = part[4];
+        
         // Periksa apakah email [email] memiliki repository [repository]
         // Jika tidak memiliki
             // kirim pesan msg : failed [email]_don't_have_repository_[repository]
@@ -34,6 +40,6 @@ public class KCheck extends KMessage {
             // Kirim pesan msg : structure [repository] [revision] [struct_content]
             // [struct_content] diperoleh dari tabel revision_repo
 
-        return true;
+        return response;
     }
 }

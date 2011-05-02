@@ -5,23 +5,29 @@
 
 package kotakserver.model;
 
-import java.net.Socket;
-
 /**
  *
  * @author user
  */
 public class KGetFile extends KMessage {
 
-    public KGetFile(Socket socket) {
-        super(socket);
+    public KGetFile(String request) {
+        super(request);
     }
 
     @Override
-    public boolean  run() {
+    public String  run() {
+        response = "failed";
         // TODO Run
 
         // Menerima pesan msg: getfile [email] [password] [repository] [path] [revision]
+        String[] part = request.split(" ");
+        String email = part[1];
+        String pass = part[2];
+        String repository = part[3];
+        String path = part[4];
+        String revision = part[5];
+        
         // [path] file yang direqeust, misal : progin5/kotak/Main.java
 
         // Check apakah [path] terdapat pada [repository] di revisi [revision]
@@ -33,7 +39,7 @@ public class KGetFile extends KMessage {
 
         // Jika tidak ada kirim pesan : failed [failed_msg]
 
-        return true;
+        return response;
     }
 
 }
