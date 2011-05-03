@@ -1,4 +1,4 @@
-package com.kotak.transferprotocol;
+package com.kotak.protocol.transfer;
 
 import java.io.IOException;
 import java.net.Socket;
