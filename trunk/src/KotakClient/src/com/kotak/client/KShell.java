@@ -5,7 +5,7 @@
 package com.kotak.client;
 
 import com.kotak.client.model.KAppData;
-import com.kotak.transferprotocol.KTPClient;
+import com.kotak.protocol.transfer.KTPClient;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
