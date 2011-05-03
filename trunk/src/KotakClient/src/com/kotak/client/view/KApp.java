@@ -1,5 +1,5 @@
 /*
- * KotakApp.java
+ * KApp.java
  *
  * Created on Apr 30, 2011, 5:33:38 PM
  */
@@ -13,13 +13,13 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import com.kotak.client.Main;
-import com.kotak.client.model.AppData;
+import com.kotak.client.model.KAppData;
 
 /**
  *
  * @author user
  */
-public class KotakApp extends javax.swing.JFrame {
+public class KApp extends javax.swing.JFrame {
 
     private boolean  pressed = false;
     private int deltaX = 0;
@@ -27,8 +27,8 @@ public class KotakApp extends javax.swing.JFrame {
 
     private boolean login = false;
 
-    /** Creates new form KotakApp */
-    public KotakApp() {
+    /** Creates new form KApp */
+    public KApp() {
         initComponents();
     }
 
@@ -78,7 +78,7 @@ public class KotakApp extends javax.swing.JFrame {
         setUndecorated(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
-                KotakApp.this.windowClosed(evt);
+                KApp.this.windowClosed(evt);
             }
         });
 
@@ -368,15 +368,15 @@ public class KotakApp extends javax.swing.JFrame {
     }
 
     private void saveAccountData() {
-        AppData.instance.setLogin(login);
-        AppData.instance.setUsername(jTextFieldEmail.getText());
-        AppData.instance.setPassword(new String(jPasswordField.getPassword()));
+        KAppData.instance.setLogin(login);
+        KAppData.instance.setUsername(jTextFieldEmail.getText());
+        KAppData.instance.setPassword(new String(jPasswordField.getPassword()));
         try {
-            AppData.save(AppData.instance);
+            KAppData.save(KAppData.instance);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -424,16 +424,16 @@ public class KotakApp extends javax.swing.JFrame {
             
 
             // Set new Folder Path
-            AppData.instance.setWorkingFolder(newPath);
+            KAppData.instance.setWorkingFolder(newPath);
             jTextFieldFolder.setText(newPath);
 
             // Save
             try {
-                AppData.save(AppData.instance);
+                KAppData.save(KAppData.instance);
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_jButtonOpenActionPerformed
@@ -443,17 +443,17 @@ public class KotakApp extends javax.swing.JFrame {
         String newURL = jTextFieldURL.getText();
         String newPort = jTextFieldPort.getText();
 
-        // Set to AppData
-        AppData.instance.setServerURL(newURL);
-        AppData.instance.setServerPort(Integer.parseInt(newPort));
+        // Set to KAppData
+        KAppData.instance.setServerURL(newURL);
+        KAppData.instance.setServerPort(Integer.parseInt(newPort));
 
         // Save
         try {
-            AppData.save(AppData.instance);
+            KAppData.save(KAppData.instance);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(KotakApp.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButtonSaveActionPerformed
 
@@ -472,7 +472,7 @@ public class KotakApp extends javax.swing.JFrame {
 //    public static void main(String args[]) {
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
-//                new KotakApp().setVisible(true);
+//                new KApp().setVisible(true);
 //            }
 //        });
 //    }
@@ -508,12 +508,12 @@ public class KotakApp extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     public void init() {
-        jTextFieldFolder.setText(AppData.instance.getWorkingFolder());
-        jTextFieldURL.setText(AppData.instance.getServerURL());
-        jTextFieldPort.setText(String.valueOf(AppData.instance.getServerPort()));
-        jTextFieldEmail.setText(AppData.instance.getEmail());
-        jPasswordField.setText(AppData.instance.getPassword());
-        login = AppData.instance.isLogin();
+        jTextFieldFolder.setText(KAppData.instance.getWorkingFolder());
+        jTextFieldURL.setText(KAppData.instance.getServerURL());
+        jTextFieldPort.setText(String.valueOf(KAppData.instance.getServerPort()));
+        jTextFieldEmail.setText(KAppData.instance.getEmail());
+        jPasswordField.setText(KAppData.instance.getPassword());
+        login = KAppData.instance.isLogin();
 
         // Render panel accout
         renderAccount();

@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.kotak.client.model.AppData;
-import com.kotak.client.view.KotakApp;
+import com.kotak.client.model.KAppData;
+import com.kotak.client.view.KApp;
 
 /**
  *
@@ -18,7 +18,7 @@ import com.kotak.client.view.KotakApp;
  */
 public class Main {
 
-    public static Daemon daemon;
+    public static KDaemon daemon;
 
     /**
      * @param args the command line arguments
@@ -26,25 +26,25 @@ public class Main {
     public static void main(String[] args) {
         try {
             // Load Data
-            AppData.instance = AppData.load();
+            KAppData.instance = KAppData.load();
 
             // Start App
             java.awt.EventQueue.invokeLater(new Runnable() {
                 public void run() {
-                    KotakApp kotak = new KotakApp();
+                    KApp kotak = new KApp();
                     kotak.init();
                     kotak.setVisible(true);
                 }
             });
 
-            // Start Daemon
-            daemon = new Daemon(AppData.instance.getEmail(), AppData.instance.getPassword());
+            // Start KDaemon
+            daemon = new KDaemon(KAppData.instance.getEmail(), KAppData.instance.getPassword());
             //daemon.start();
 
         } catch (FileNotFoundException ex) {
             try {
-                AppData.instance = new AppData();
-                AppData.save(AppData.instance);
+                KAppData.instance = new KAppData();
+                KAppData.save(KAppData.instance);
             } catch (FileNotFoundException ex1) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex1);
             } catch (IOException ex1) {
@@ -52,8 +52,8 @@ public class Main {
             }
         } catch (InvalidClassException ex) {
             try {
-                AppData.instance = new AppData();
-                AppData.save(AppData.instance);
+                KAppData.instance = new KAppData();
+                KAppData.save(KAppData.instance);
             } catch (FileNotFoundException ex1) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex1);
             } catch (IOException ex1) {

@@ -18,34 +18,34 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class AppData implements Serializable {
+public class KAppData implements Serializable {
     private static String fileName = ".kotak";
     private String serverURL = "127.0.0.1";
     private int serverPort = 10000;
     private String workingFolder = "";
     private String email;
     private String password;
-    private ArrayList<Repository> repositories;
-    public static AppData instance;
+    private ArrayList<KRepository> repositories;
+    public static KAppData instance;
     private boolean login = false;
 
-    public AppData() {
-        repositories = new ArrayList<Repository>();
-        Repository temp = new Repository("indonesia", 1);
+    public KAppData() {
+        repositories = new ArrayList<KRepository>();
+        KRepository temp = new KRepository("indonesia", 1);
         repositories.add(temp);
     }
 
-    public static AppData load() throws FileNotFoundException, IOException, ClassNotFoundException {
+    public static KAppData load() throws FileNotFoundException, IOException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(fileName);
         ObjectInputStream ois = new ObjectInputStream(fis);
         
-        AppData data = (AppData)ois.readObject();
+        KAppData data = (KAppData)ois.readObject();
         ois.close();
 
         return data;
     }
 
-    public static void save(AppData data) throws FileNotFoundException, IOException {
+    public static void save(KAppData data) throws FileNotFoundException, IOException {
         FileOutputStream fos = new FileOutputStream(fileName);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(data);
@@ -97,14 +97,14 @@ public class AppData implements Serializable {
     /**
      * @return the repositories
      */
-    public ArrayList<Repository> getRepositories() {
+    public ArrayList<KRepository> getRepositories() {
         return repositories;
     }
 
     /**
      * @param repositories the repositories to set
      */
-    public void setRepositories(ArrayList<Repository> repositories) {
+    public void setRepositories(ArrayList<KRepository> repositories) {
         this.setRepositories(repositories);
     }
 

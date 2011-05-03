@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package com.kotak.client;
+package com.kotak.util;
 
 /**
  *

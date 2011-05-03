@@ -1,4 +1,4 @@
-package com.kotak.client;
+package com.kotak.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  *
  * @author user
  */
-public class FileSystem {
+public class KFileSystem {
 
     /**
      * Move folder or file
@@ -117,11 +117,11 @@ public class FileSystem {
         try {
             move("tes", "D:/Rezan/Informatika/Kuliah/Semester 6/2010-2011/Pemograman Internet/Tugas/", "C:/Users/user/Desktop/");
         } catch (IOException ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KFileSystem.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.ALL, null, ex);
+            Logger.getLogger(KFileSystem.class.getName()).log(Level.ALL, null, ex);
         } catch (Exception ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.ALL, null, ex);
+            Logger.getLogger(KFileSystem.class.getName()).log(Level.ALL, null, ex);
         }
     }
 }
