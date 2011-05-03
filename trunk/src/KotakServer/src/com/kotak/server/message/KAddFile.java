@@ -1,9 +1,9 @@
-package kotakserver.model;
+package com.kotak.server.message;
 
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import kotakserver.database.QueryManagement;
+import com.kotak.server.database.QueryManagement;
 
 /**
  *

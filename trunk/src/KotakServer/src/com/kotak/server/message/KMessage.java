@@ -1,4 +1,4 @@
-package kotakserver.model;
+package com.kotak.server.message;
 
 /**
  *

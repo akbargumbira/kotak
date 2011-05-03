@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package kotakserver.database;
+package com.kotak.server.database;
 
 import com.mysql.jdbc.Connection;
 import java.sql.*;
