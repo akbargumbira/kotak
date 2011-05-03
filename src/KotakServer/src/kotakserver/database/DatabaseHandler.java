@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package kotakserver;
+package kotakserver.database;
 
 import com.mysql.jdbc.Connection;
 import java.sql.DriverManager;
@@ -15,11 +15,11 @@ import java.sql.SQLException;
  */
 public class DatabaseHandler {
     protected final String driver = "com.mysql.jdbc.Driver";
-    protected final String dbName = "maninrelaychat";
+    protected final String dbName = "kotak";
     protected final String dbUserName = "root";
     protected final String dbPassword = "";
 
-    protected Connection getConnection()
+    public Connection getConnection()
            throws  Exception{
             Class.forName(driver);
             Connection connection = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/" + dbName, dbUserName, dbPassword);
