@@ -28,9 +28,16 @@ public class Child extends KThread {
     @Override
     public void start() {
         try {
+            // Get Request
             String request = ktp.getRequest();
+            
+            // Init
             String response = "failed";
+            
+            // Split until find FIRST space
             String[] sArr = request.split(" ", 1);
+            
+            // Get message
             String msg = (sArr.length > 0) ? sArr[0] : "";
 
             if (msg.equals("check")) {
@@ -43,6 +50,7 @@ public class Child extends KThread {
                 response = (new KDelete(request)).run();
             }
 
+            // Send Response
             ktp.sendResponse(response);
         } catch (IOException ex) {
             Logger.getLogger(Child.class.getName()).log(Level.SEVERE, null, ex);

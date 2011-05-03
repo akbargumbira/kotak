@@ -28,6 +28,8 @@ public class KGetFile extends KMessage {
         String path = part[4];
         String revision = part[5];
         
+        String queryPass = "SELECT password FROM user WHERE email = '"+email+"' ";
+        
         // [path] file yang direqeust, misal : progin5/kotak/Main.java
 
         // Check apakah [path] terdapat pada [repository] di revisi [revision]

@@ -1,5 +1,8 @@
 package kotakserver.model;
 
+import java.sql.ResultSet;
+import kotakserver.database.QueryManagement;
+
 /**
  *
  * @author user
@@ -16,7 +19,13 @@ public class KAddFile extends KMessage {
         // TODO AddFile
 
         // Menerima pesan : addfile [repository] [last_revision] [path] [content]#
+        String[] part = request.split(" ");
 
+        String repository = part[0];
+        String last_revision = part[1];
+        String path = part[2];
+        String content = part[3];
+        
         // Periksa [email] [pass]
         // Jika tidak cocok
             // kirim pesan failed email_or_pass_is_wrong
@@ -54,6 +63,32 @@ public class KAddFile extends KMessage {
                 // kirim pesan : success [last_revision]
         // Unlock repository
 
+        
+        //Cek apakah email sesuai dengan passwordnya :
+        QueryManagement qM;        
+        try {
+            qM = new QueryManagement();
+            ResultSet rs = qM.SELECT(queryPass);
+            if (rs.next()) {
+              //Masuk ke proses check  
+                // Jika [revision] sama dengan revisi terakhir [repository] di server
+                    // Kirim pesan msg : nochange [repository]
+                // Jika berbeda
+                    // Kirim pesan msg : structure [repository] [revision] [struct_content]
+                    // [struct_content] diperoleh dari tabel revision_repo
+             
+
+            }
+            else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("failed email_or_pass_is_wrong");
+                response = sb.toString(); 
+            }
+                
+        } catch (Exception ex) {
+            Logger.getLogger(KCheck.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
         return response;
     }
 
