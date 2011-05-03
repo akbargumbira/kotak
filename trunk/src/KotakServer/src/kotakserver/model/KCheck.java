@@ -23,7 +23,6 @@ public class KCheck extends KMessage {
     @Override
     public String  run() {
         // TODO run
-        String response = null;
         // Menerima pesan : check [email] [pass] [repository] [revision]
         String[] part = request.split(" ");
         
@@ -32,7 +31,7 @@ public class KCheck extends KMessage {
         String repository = part[3];
         String revision = part[4];
         
-        String queryPass = "SELECT * FROM user WHERE email = '"+email+"e' AND password = '"+pass+ "'";
+        String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
         String queryLastRev = "SELECT revision_repo.structure, MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
                 + "WHERE repository.name ='"+email+"'";
         
@@ -66,7 +65,7 @@ public class KCheck extends KMessage {
              else {
                  StringBuilder sb = new StringBuilder();
                  String structure = rsRev.getString("revision_repo.structure");
-                 sb.append("success structure "+LasRev+" "+structure);
+                sb.append("success structure ").append(LasRev).append(" ").append(structure);
                  response = sb.toString();
              }
             }
@@ -79,9 +78,6 @@ public class KCheck extends KMessage {
         } catch (Exception ex) {
             Logger.getLogger(KCheck.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        
-      
         return response;
     }
 }
