@@ -1,5 +1,8 @@
 package com.kotak.server.message;
 
+import com.kotak.server.database.QueryManagement;
+import java.sql.ResultSet;
+
 /**
  *
  * @author user
@@ -15,7 +18,7 @@ public class KDelete extends KMessage {
         response = "failed";
         // TODO Run
 
-        // Menerima pesan delete [email] [pass] [repository] [path] [last_revision]
+        // Menerima pesan delete [email] [pass] [repository] [path] [client_last_revision]
         String[] part = request.split(" ");
       
         String email = part[1];
@@ -24,7 +27,11 @@ public class KDelete extends KMessage {
         String path = part[4];
         String last_revision = part[5];
         
+        boolean isLocked = false;
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
+        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
+                + "WHERE repository.name ='"+email+"'";
+
         // Periksa email dan pass
         // Jika tidak cocok
             // kirim pesan failed email_or_pass_is_wrong
@@ -61,7 +68,47 @@ public class KDelete extends KMessage {
         // Jika sukses
             // kirim pesan : success [last_revision]
         // Unlock repository
-
+        
+        
+        QueryManagement qM;        
+        try {
+            qM = new QueryManagement();
+            ResultSet rs = qM.SELECT(queryPass);
+            if (rs.next()) {
+             if (!isLocked) {
+                 //Ga di lock
+                 //Periksa revisi sama ga ma last revisi
+                 ResultSet rsRev = qM.SELECT(queryLastRev);
+                 String LasRev = rsRev.getString("MAX(revision_repo.rev_num)");
+                 if (LasRev.equals(last_revision)) {
+                     //Hapus File
+                     isLocked = true;
+                     
+                     
+                     
+                     isLocked = false;
+                 } else {
+                     StringBuilder sb = new StringBuilder();
+                     sb.append("failed revision_not_same");
+                     response = sb.toString();
+                 }
+ 
+             } else {
+                 StringBuilder sb = new StringBuilder();
+                 sb.append("failed repository_is_locked");
+                 response = sb.toString(); 
+             }
+            }
+            else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("failed email_or_pass_is_wrong");
+                response = sb.toString(); 
+            }
+                
+        } catch (Exception ex) {
+            Logger.getLogger(KCheck.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+       
         return response;
     }
 
