@@ -14,10 +14,9 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.client.model.KAppData;
-import com.kotak.client.model.KFile;
-import com.kotak.transferprotocol.KTPClient;
+import com.kotak.protocol.transfer.KTPClient;
+import com.kotak.util.KFile;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  *
