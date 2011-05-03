@@ -30,7 +30,11 @@ public class KAddFile extends KMessage {
         String path = part[5];
         String content = part[6];
         
+        boolean isLocked = false;
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
+        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
+                + "WHERE repository.name ='"+email+"'";
+        
         
         // Periksa [email] [pass]
         // Jika tidak cocok
@@ -76,14 +80,29 @@ public class KAddFile extends KMessage {
             qM = new QueryManagement();
             ResultSet rs = qM.SELECT(queryPass);
             if (rs.next()) {
-              //Masuk ke proses check  
-                // Jika [revision] sama dengan revisi terakhir [repository] di server
-                    // Kirim pesan msg : nochange [repository]
-                // Jika berbeda
-                    // Kirim pesan msg : structure [repository] [revision] [struct_content]
-                    // [struct_content] diperoleh dari tabel revision_repo
-             
-
+             if (!isLocked) {
+                 //Ga di lock
+                 //Periksa revisi sama ga ma last revisi
+                 ResultSet rsRev = qM.SELECT(queryLastRev);
+                 String LasRev = rsRev.getString("MAX(revision_repo.rev_num)");
+                 if (LasRev.equals(last_revision)) {
+                     //Tambah File
+                     isLocked = true;
+                     
+                     
+                     
+                     isLocked = false;
+                 } else {
+                     StringBuilder sb = new StringBuilder();
+                     sb.append("failed revision_not_same");
+                     response = sb.toString();
+                 }
+ 
+             } else {
+                 StringBuilder sb = new StringBuilder();
+                 sb.append("failed repository_is_locked");
+                 response = sb.toString(); 
+             }
             }
             else {
                 StringBuilder sb = new StringBuilder();
@@ -97,5 +116,4 @@ public class KAddFile extends KMessage {
         
         return response;
     }
-
 }
