@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.server.database.QueryManagement;
+import com.kotak.util.FileSystemServer;
 
 /**
  *
@@ -30,7 +31,7 @@ public class KGetFile extends KMessage {
         
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
         String queryStructure = "SELECT revision_repo.structure FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
-                + "WHERE repository.name ='"+email+"' AND revision_repo.rev_num = '"+revision+"' ";
+                + "WHERE repository.name ='"+email+"' AND revision_repo.rev_num = '"+revision+"'";
         // [path] file yang direqeust, misal : progin5/kotak/Main.java
 
         // Check apakah [path] terdapat pada [repository] di revisi [revision]
@@ -52,9 +53,28 @@ public class KGetFile extends KMessage {
                     //File yang direquest ada
                     String struct =  rsStructure.getString("revision_repo.structure");
                     KFile file = (KFile)(new Gson()).fromJson(struct, KFile.class);
+                    if (file.findFile(path)) { //file ada
+                        FileSystemServer fsServer = new FileSystemServer();
+                        byte[] fileBytes = fsServer.getFileContent(repository, Integer.parseInt(revision), path);
+                        if (fileBytes!=null) {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("success").append(fileBytes);
+                            response = sb.toString();
+                        } else { //ga ada file di server
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("failed file_not_found");
+                            response = sb.toString();
+                        }
+                            
+                    } else {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("failed no_such_requested_file");
+                        response = sb.toString();
+                    }
+                        
                 } else {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("failed requested_file_not_exist");
+                    sb.append("failed no_such_structure");
                     response = sb.toString();
                 }
             } else {
