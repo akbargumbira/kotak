@@ -1,14 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package com.kotak.transferprotocol;
 
-import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 
 /**
  *
@@ -29,8 +22,6 @@ public class KTPServer extends KTP {
         while((temp = in.read()) > -1) {
             sb.append((char)temp);
         }
-
-        parameters = (new Gson()).fromJson(sb.toString(), HashMap.class);
 
         return sb.toString();
     }
