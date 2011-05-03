@@ -27,12 +27,13 @@ public class KCheck extends KMessage {
         // Menerima pesan : check [email] [pass] [repository] [revision]
         String[] part = request.split(" ");
         
-        String email = part[0];
-        String pass = part[1];
-        String repository = part[2];
-        String revision = part[3];
+        String email = part[1];
+        String pass = part[2];
+        String repository = part[3];
+        String revision = part[4];
         
-        String queryPass = "SELECT password FROM user WHERE email = '"+email+"' ";
+        String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
+      
         
         //GAK PERLU
         /* // Periksa apakah email [email] memiliki repository [repository]

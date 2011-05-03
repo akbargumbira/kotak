@@ -18,13 +18,17 @@ public class KAddFile extends KMessage {
         response = "failed";
         // TODO AddFile
 
-        // Menerima pesan : addfile [repository] [last_revision] [path] [content]#
+        // Menerima pesan : addfile [email] [pass] [repository] [last_revision] [path] [content]#
         String[] part = request.split(" ");
 
-        String repository = part[0];
-        String last_revision = part[1];
-        String path = part[2];
-        String content = part[3];
+        String email = part[1];
+        String pass = part[2];
+        String repository = part[3];
+        String last_revision = part[4];
+        String path = part[5];
+        String content = part[6];
+        
+        String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
         
         // Periksa [email] [pass]
         // Jika tidak cocok
