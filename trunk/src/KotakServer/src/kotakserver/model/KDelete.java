@@ -18,13 +18,13 @@ public class KDelete extends KMessage {
         // Menerima pesan delete [email] [pass] [repository] [path] [last_revision]
         String[] part = request.split(" ");
       
-        String email = part[0];
-        String pass = part[1];
-        String repository = part[2];
-        String path = part[3];
-        String last_revision = part[4];
+        String email = part[1];
+        String pass = part[2];
+        String repository = part[3];
+        String path = part[4];
+        String last_revision = part[5];
         
-        String queryPass = "SELECT password FROM user WHERE email = '"+email+"' ";
+        String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
         // Periksa email dan pass
         // Jika tidak cocok
             // kirim pesan failed email_or_pass_is_wrong
