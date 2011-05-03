@@ -1,19 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package kotakserver;
+package com.kotak.server;
 
 import com.google.gson.Gson;
-import com.kotak.transferprotocol.KTPServer;
+import com.kotak.protocol.transfer.KTPServer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import kotakserver.model.KFile;
+import com.kotak.util.KFile;
 
 /**
  *

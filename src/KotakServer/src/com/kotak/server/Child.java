@@ -2,16 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package kotakserver;
+package com.kotak.server;
 
-import com.kotak.transferprotocol.KTPServer;
+import com.kotak.protocol.transfer.KTPServer;
+import com.kotak.util.KThread;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import kotakserver.model.KAddFile;
-import kotakserver.model.KCheck;
-import kotakserver.model.KDelete;
-import kotakserver.model.KGetFile;
+import com.kotak.server.message.KAddFile;
+import com.kotak.server.message.KCheck;
+import com.kotak.server.message.KDelete;
+import com.kotak.server.message.KGetFile;
 
 /**
  *

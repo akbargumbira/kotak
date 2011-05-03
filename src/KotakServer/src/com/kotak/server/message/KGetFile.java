@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package kotakserver.model;
+package com.kotak.server.message;
 import com.google.gson.Gson;
+import com.kotak.util.KFile;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import kotakserver.database.QueryManagement;
+import com.kotak.server.database.QueryManagement;
 
 /**
  *
