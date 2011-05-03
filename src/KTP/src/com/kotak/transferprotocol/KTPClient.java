@@ -1,6 +1,5 @@
 package com.kotak.transferprotocol;
 
-import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -11,15 +10,26 @@ import java.net.UnknownHostException;
  */
 public class KTPClient extends KTP {
     
-    public void sendRequest(String address, int port) throws UnknownHostException, IOException {
+    /**
+     * Send request
+     * @param address Server address
+     * @param port Server port
+     * @param message String to send
+     * @return Response from server
+     * @throws UnknownHostException
+     * @throws IOException 
+     */
+    public String sendRequest(String address, int port, String message) throws UnknownHostException, IOException {
         socket = new Socket(address, port);
         out = socket.getOutputStream();
 
-        out.write((new Gson()).toJson(parameters).getBytes());
+        out.write(message.getBytes());
         out.close();
+        
+        return getResponse();
     }
 
-    public String getResponse() throws IOException {
+    private String getResponse() throws IOException {
         StringBuilder sb = new StringBuilder();
         int temp;
         in = socket.getInputStream();

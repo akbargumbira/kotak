@@ -3,6 +3,10 @@ package kotakserver.model;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * File or Folder
+ * @author user
+ */
 public class KFile {
     private String name;
     private Date modified;
