@@ -14,6 +14,10 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.client.model.KAppData;
+import com.kotak.client.model.KFile;
+import com.kotak.transferprotocol.KTPClient;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -30,6 +34,11 @@ public class KDaemon extends MyThread {
     private String email;
     private String pass;
     private String repo;
+    private KTPClient ktp;
+    String response;
+    String message;
+    String[] part;
+    String prefix;
 
     public KDaemon(String email, String pass) {
         this.email = email;
@@ -41,12 +50,13 @@ public class KDaemon extends MyThread {
 
     @Override
     public void start() {
+        ktp = new KTPClient();
         // TODO Start KDaemon
         while (loop) {
             syncRepository();
         }
     }
-
+    
     private void syncRepository() {
         try {
             KLogger.writeln("Waiting for connection from " + URL + ":" + port);
@@ -74,19 +84,37 @@ public class KDaemon extends MyThread {
         }
     }
 
-    private boolean serverSync() {
-        // Send Check
-        // msg : check [email] [pass] [repository] [revision]
+    private boolean serverSync() throws UnknownHostException, IOException {
+        // TODO Check
+        // Set msg : check [email] [pass] [repository] [client_revision]
+        message = "check " + email + " " + pass + " " + email;
         
-        // if succes & response not null
+        // Send message and wait for response
+        response = ktp.sendRequest(URL, port, message);
+        
+        // Split the response
+        part = response.split(" ", 3);
+        
+        // Get prefix
+        prefix = (part != null && part.length > 0) ? part[0] : "";
+        
+        // Response is a structure?
+        boolean isStructure = (part != null && part.length > 1 && part[1].equals("structure"));
+        
+        if(prefix.equals("success") && isStructure && part.length == 4 ) {
+            // Get revision
+            int revision = Integer.parseInt(part[2]);
+            
             // Get structure form response
+            String gson = part[3];
 
-            // Compare with structure in client
+            // TODO Compare with structure in client
 
-            // Delete file that not in new Structure
+            // TODO Delete file that not in new Structure
 
-            // Update file that modified in structure or Add file that only in structure
+            // TODO Update file that modified in structure or Add file that only in structure
             // Foreach
+                // TODO getfile
                 // getfile [email] [pass] [repository] [path] [revision]
 
                 // Wait for response
@@ -96,18 +124,33 @@ public class KDaemon extends MyThread {
                     // Add to storage
 
             // Update revision number and Structure
-        // else
-            // return false;
+        }
 
         return true;
     }
 
+    private void delete(String path, KFile kFile) {
+        KFile server = new KFile(path, null);
+        ArrayList<KFile> files = kFile.getFiles();
+        int size = files.size();
+
+        for (int i=0; i < size; ++i) {
+            String newPath = path + "/" + files.get(i).getName();
+            if(server.findFile(newPath)) {
+                delete(path, kFile);
+            } else {
+                // Delete
+            }
+        }
+    }
+    
     private boolean clientSync() {
         // Check change in client
        
         // Compare saved structure and current structure
 
         // Foreach deleted file/folder
+            // TODO delete
             // delete [email] [pass] [repository] [path] [last_revision]
             // if response is failed
                 // return false
@@ -116,6 +159,7 @@ public class KDaemon extends MyThread {
                 // Update structure
         
         // Foreach add/updated file/folder
+            // TODO addfile
             // msg : addfile [email] [pass] [repository] [last_revision] [path] [content]
             // If reponse is failed
                 // return false
