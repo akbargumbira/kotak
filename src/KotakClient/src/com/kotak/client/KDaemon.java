@@ -4,6 +4,8 @@
  */
 package com.kotak.client;
 
+import com.kotak.util.MyThread;
+import com.kotak.util.KLogger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,13 +13,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.kotak.client.model.AppData;
+import com.kotak.client.model.KAppData;
 
 /**
  *
  * @author user
  */
-public class Daemon extends MyThread {
+public class KDaemon extends MyThread {
 
     private String workingFolder = "";
     private Socket socket;
@@ -29,17 +31,17 @@ public class Daemon extends MyThread {
     private String pass;
     private String repo;
 
-    public Daemon(String email, String pass) {
+    public KDaemon(String email, String pass) {
         this.email = email;
         this.pass = pass;
-        URL = AppData.instance.getServerURL();
-        port = AppData.instance.getServerPort();
-        workingFolder = AppData.instance.getWorkingFolder();
+        URL = KAppData.instance.getServerURL();
+        port = KAppData.instance.getServerPort();
+        workingFolder = KAppData.instance.getWorkingFolder();
     }
 
     @Override
     public void start() {
-        // TODO Start Daemon
+        // TODO Start KDaemon
         while (loop) {
             syncRepository();
         }
@@ -66,9 +68,9 @@ public class Daemon extends MyThread {
             // Synchronize client
             clientSync();
         } catch (UnknownHostException ex) {
-            Logger.getLogger(Daemon.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(Daemon.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

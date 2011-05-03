@@ -1,4 +1,4 @@
-package com.kotak.client;
+package com.kotak.util;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

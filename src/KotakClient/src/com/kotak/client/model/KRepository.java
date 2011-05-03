@@ -11,14 +11,14 @@ import java.io.Serializable;
  *
  * @author user
  */
-public class Repository implements Serializable {
+public class KRepository implements Serializable {
     private String name;
     private int revision;
 
-    public Repository() {
+    public KRepository() {
     }
 
-    public Repository(String name, int revision) {
+    public KRepository(String name, int revision) {
         this.name = name;
         this.revision = revision;
     }
