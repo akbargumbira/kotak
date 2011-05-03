@@ -32,8 +32,9 @@ public class KCheck extends KMessage {
         String repository = part[3];
         String revision = part[4];
         
-        String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-      
+        String queryPass = "SELECT * FROM user WHERE email = '"+email+"e' AND password = '"+pass+ "'";
+        String queryLastRev = "SELECT revision_repo.structure, MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
+                + "WHERE repository.name ='"+email+"'";
         
         //GAK PERLU
         /* // Periksa apakah email [email] memiliki repository [repository]
@@ -51,12 +52,23 @@ public class KCheck extends KMessage {
             if (rs.next()) {
               //Masuk ke proses check  
                 // Jika [revision] sama dengan revisi terakhir [repository] di server
-                    // Kirim pesan msg : nochange [repository]
+                    // Kirim pesan msg : nochange
                 // Jika berbeda
-                    // Kirim pesan msg : structure [repository] [revision] [struct_content]
+                    // Kirim pesan msg : structure [revision] [struct_content]
                     // [struct_content] diperoleh dari tabel revision_repo
-             
-
+             ResultSet rsRev = qM.SELECT(queryLastRev);
+             String LasRev = rsRev.getString("MAX(revision_repo.rev_num)");
+             if (LasRev.equals(revision)) {
+                 StringBuilder sb = new StringBuilder();
+                 sb.append("success nochange");
+                 response = sb.toString();
+             }
+             else {
+                 StringBuilder sb = new StringBuilder();
+                 String structure = rsRev.getString("revision_repo.structure");
+                 sb.append("success structure "+LasRev+" "+structure);
+                 response = sb.toString();
+             }
             }
             else {
                 StringBuilder sb = new StringBuilder();
