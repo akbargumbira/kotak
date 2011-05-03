@@ -34,6 +34,11 @@ public class KFile {
         this.modified = modified;
     }
 
+    /**
+     * Compare : may be not used :( failed
+     * @param kFile
+     * @return 
+     */
     public boolean compare(KFile kFile) {
         if (kFile == null) {
             return false;

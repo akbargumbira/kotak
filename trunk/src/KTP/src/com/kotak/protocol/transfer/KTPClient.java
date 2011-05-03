@@ -29,15 +29,21 @@ public class KTPClient extends KTP {
         return getResponse();
     }
 
+    /**
+     * Get response
+     * @return Response from server
+     * @throws IOException 
+     */
     private String getResponse() throws IOException {
         StringBuilder sb = new StringBuilder();
         int temp;
         in = socket.getInputStream();
 
-        while ((temp = in.read()) > 0) {
+        while ((temp = in.read()) > -1) {
             sb.append((char)temp);
         }
 
+        in.close();
         socket.close();
         
         return sb.toString();
