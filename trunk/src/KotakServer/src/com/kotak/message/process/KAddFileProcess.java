@@ -98,6 +98,10 @@ public class KAddFileProcess extends KMessageProcess {
                      //Tambah File
                      isLocked = true;
                      
+                     //Create folder r(last_revision+1)
+                     File folder = new File(ServerData.baseURL+"/"+repository+"r"+(last_revision+1));
+                     folder.mkdir();
+                     
                      String strSavePath = ServerData.baseURL+"/"+repository+"r"+(last_revision+1)+"/"+path;
                      byte[] contentFile = content.getBytes();
                      KFileSystem.save(strSavePath, contentFile);
@@ -107,17 +111,32 @@ public class KAddFileProcess extends KMessageProcess {
                      String structure = rsRev.getString("revision_repo.structure");
                      KFile fileStructure = KFile.fromJSONString(structure);
                      KFile fileUpdated = fileStructure.findFile(path);
+                     String structureUpdated;
                      if (fileUpdated != null) { //file update
                          fileUpdated.setModified(new Date(new File(strSavePath).lastModified()));
-                         String structureUpdated  = KFile.toJSON(fileStructure);
-                         //Update to database
-                         String repo_id = rsRev.getString("repository.id");
-                         INSERT INTO 
-                     } else { //new file added
+                         structureUpdated  = KFile.toJSON(fileStructure);
                          
+                     } else { //new file added
+                         //Parsing path buat dapet parent ma name
+                         String[] part = path.split("/");
+                         String fileName = part[part.length-1];
+                         KFile fileAdded = new KFile(fileName, new Date(new File(strSavePath).lastModified()));
+                         fileStructure.findFile(path.replace("/" + fileName, "")).addFile(fileAdded);
+                         structureUpdated= KFile.toJSON(fileStructure);
                      }
-                     
-                     
+                     //Update to database
+                     String repo_id = rsRev.getString("repository.id");
+                     String queryInsert = "INSERT INTO revision_repo ('repo_id','rev_num','structure')"
+                             + "VALUES (' '"+repo_id+"' ',' '"+(last_revision+1)+"' ',' '"+structureUpdated+"' ')";
+                     if (qM.INSERT(queryInsert)==0) { //insert berhasil
+                         StringBuilder sb = new StringBuilder();
+                         sb.append("success ").append(last_revision+1);
+                         response = sb.toString();
+                     } else {
+                         StringBuilder sb = new StringBuilder();
+                         sb.append("failed add_failed");
+                         response = sb.toString();
+                     }
                      isLocked = false;
                  } else {
                      StringBuilder sb = new StringBuilder();
