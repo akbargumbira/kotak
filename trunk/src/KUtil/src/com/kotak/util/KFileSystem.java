@@ -114,6 +114,13 @@ public class KFileSystem {
         return target.delete();
     }
     
+    /**
+     * Save file
+     * @param path File path
+     * @param content Content of file
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     public static void save(String path, byte[] content) throws FileNotFoundException, IOException {
         File file = new File(path);
         
@@ -122,6 +129,30 @@ public class KFileSystem {
             fos.write(content);
             fos.close();
         }
+    }
+    
+    /**
+     * Get content of file
+     * @param path File path
+     * @return Array of bytes of file's content
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    public static byte[] open(String path) throws FileNotFoundException, IOException {
+        byte[] bytes = null;
+        File file = new File(path);
+        
+        if (file.exists()) {
+            FileInputStream fis = new FileInputStream(file);
+            
+            // Create buffer
+            bytes = new byte[(int)file.length()];
+            
+            // Read
+            fis.read(bytes);
+        }
+        
+        return bytes;
     }
 
     public static void main(String[] args) {

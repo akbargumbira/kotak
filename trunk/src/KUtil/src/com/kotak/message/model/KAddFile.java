@@ -1,5 +1,7 @@
 package com.kotak.message.model;
 
+import com.kotak.util.KFile;
+
 /**
  *
  * @author user
@@ -7,9 +9,9 @@ package com.kotak.message.model;
 public class KAddFile extends KMessage {
     protected int clientLastRevision;
     protected String filePath;
-    protected String fileContent;
+    protected byte[] fileContent;
 
-    public KAddFile(String email, String pass, String repository, int clientLastRevision, String filePath, String fileContent) {
+    public KAddFile(String email, String pass, String repository, int clientLastRevision, String filePath, byte[] fileContent) {
         super(email, pass, repository);
         this.clientLastRevision = clientLastRevision;
         this.filePath = filePath;
@@ -56,14 +58,14 @@ public class KAddFile extends KMessage {
     /**
      * @return the fileContent
      */
-    public String getFileContent() {
+    public byte[] getFileContent() {
         return fileContent;
     }
 
     /**
      * @param fileContent the fileContent to set
      */
-    public void setFileContent(String fileContent) {
+    public void setFileContent(byte[] fileContent) {
         this.fileContent = fileContent;
     }
 
