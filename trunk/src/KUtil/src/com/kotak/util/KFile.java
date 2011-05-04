@@ -211,6 +211,15 @@ public class KFile {
     public static KFile fromJSONString(String json) {
         return new Gson().fromJson(json, KFile.class);
     }
+    
+    /**
+     * To JSON
+     * @param kFile Object will be converted to string JSON
+     * @return JSON string of <i>kFile</i>
+     */
+    public static String toJSON(KFile kFile) {
+        return new Gson().toJson(kFile);
+    }
 
     /**
      * @return the parent
