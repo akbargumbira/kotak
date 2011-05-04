@@ -1,5 +1,7 @@
-package com.kotak.server.message;
+package com.kotak.message.process;
 
+import com.kotak.message.model.KAddFile;
+import com.kotak.message.model.KMessage;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,9 +11,9 @@ import com.kotak.server.database.QueryManagement;
  *
  * @author user
  */
-public class KAddFile extends KMessage {
+public class KAddFileProcess extends KMessageProcess {
 
-    public KAddFile(String request) {
+    public KAddFileProcess(KMessage request) {
         super(request);
     }
 
@@ -21,14 +23,14 @@ public class KAddFile extends KMessage {
         // TODO AddFile
 
         // Menerima pesan : addfile [email] [pass] [repository] [last_revision] [path] [content]#
-        String[] part = request.split(" ");
-
-        String email = part[1];
-        String pass = part[2];
-        String repository = part[3];
-        String last_revision = part[4];
-        String path = part[5];
-        String content = part[6];
+        
+        String email = request.getEmail();
+        String pass = request.getPass();
+        String repository = request.getRepository();
+        int last_revision = ((KAddFile)request).getClientLastRevision();
+        String path = ((KAddFile)request).getFilePath();
+        String content = ((KAddFile)request).getFileContent();
+        
         
         boolean isLocked = false;
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
@@ -84,8 +86,8 @@ public class KAddFile extends KMessage {
                  //Ga di lock
                  //Periksa revisi sama ga ma last revisi
                  ResultSet rsRev = qM.SELECT(queryLastRev);
-                 String LasRev = rsRev.getString("MAX(revision_repo.rev_num)");
-                 if (LasRev.equals(last_revision)) {
+                 int LasRev = Integer.parseInt(rsRev.getString("MAX(revision_repo.rev_num)"));
+                 if (LasRev==last_revision) {
                      //Tambah File
                      isLocked = true;
                      
@@ -111,7 +113,7 @@ public class KAddFile extends KMessage {
             }
                 
         } catch (Exception ex) {
-            Logger.getLogger(KCheck.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KCheckProcess.class.getName()).log(Level.SEVERE, null, ex);
         } 
         
         return response;

@@ -1,5 +1,8 @@
-package com.kotak.server.message;
+package com.kotak.message.process;
 import com.google.gson.Gson;
+import com.kotak.message.model.KCheck;
+import com.kotak.message.model.KGetFile;
+import com.kotak.message.model.KMessage;
 import com.kotak.util.KFile;
 import java.sql.ResultSet;
 import java.util.logging.Level;
@@ -11,9 +14,9 @@ import com.kotak.util.FileSystemServer;
  *
  * @author user
  */
-public class KGetFile extends KMessage {
+public class KGetFileProcess extends KMessageProcess {
 
-    public KGetFile(String request) {
+    public KGetFileProcess(KMessage request) {
         super(request);
     }
 
@@ -22,12 +25,13 @@ public class KGetFile extends KMessage {
         // TODO Run
 
         // Menerima pesan msg: getfile [email] [password] [repository] [path] [revision]
-        String[] part = request.split(" ");
-        String email = part[1];
-        String pass = part[2];
-        String repository = part[3];
-        String path = part[4];
-        String revision = part[5];
+        
+        String email = request.getEmail();
+        String pass = request.getPass();
+        String repository = request.getRepository();
+        String path = ((KGetFile)request).getFilePath();
+        int revision = ((KGetFile)request).getFileRevision();
+        
         
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
         String queryStructure = "SELECT revision_repo.structure FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
@@ -53,9 +57,9 @@ public class KGetFile extends KMessage {
                     //File yang direquest ada
                     String struct =  rsStructure.getString("revision_repo.structure");
                     KFile file = (KFile)(new Gson()).fromJson(struct, KFile.class);
-                    if (file.findFile(path)) { //file ada
+                    if (file.isExist(path)) { //file ada
                         FileSystemServer fsServer = new FileSystemServer();
-                        byte[] fileBytes = fsServer.getFileContent(repository, Integer.parseInt(revision), path);
+                        byte[] fileBytes = fsServer.getFileContent(repository, revision, path);
                         if (fileBytes!=null) {
                             StringBuilder sb = new StringBuilder();
                             sb.append("success").append(fileBytes);
@@ -83,7 +87,7 @@ public class KGetFile extends KMessage {
                 response = sb.toString(); 
             }   
         } catch (Exception ex) {
-            Logger.getLogger(KCheck.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KCheckProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
         return response;
     }

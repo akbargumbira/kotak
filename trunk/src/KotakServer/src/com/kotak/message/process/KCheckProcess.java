@@ -3,8 +3,10 @@
  * and open the template in the editor.
  */
 
-package com.kotak.server.message;
+package com.kotak.message.process;
 
+import com.kotak.message.model.KCheck;
+import com.kotak.message.model.KMessage;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,9 +16,9 @@ import com.kotak.server.database.QueryManagement;
  *
  * @author user
  */
-public class KCheck extends KMessage {
+public class KCheckProcess extends KMessageProcess {
 
-    public KCheck(String request) {
+    public KCheckProcess(KMessage request) {
         super(request);
     }
 
@@ -24,12 +26,11 @@ public class KCheck extends KMessage {
     public String  run() {
         // TODO run
         // Menerima pesan : check [email] [pass] [repository] [revision]
-        String[] part = request.split(" ");
         
-        String email = part[1];
-        String pass = part[2];
-        String repository = part[3];
-        String revision = part[4];
+        String email = request.getEmail();
+        String pass = request.getPass();
+        String repository = request.getRepository();
+        int revision = ((KCheck)request).getClientLastRevision();
         
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
         String queryLastRev = "SELECT revision_repo.structure, MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
@@ -56,8 +57,8 @@ public class KCheck extends KMessage {
                     // Kirim pesan msg : structure [revision] [struct_content]
                     // [struct_content] diperoleh dari tabel revision_repo
              ResultSet rsRev = qM.SELECT(queryLastRev);
-             String LasRev = rsRev.getString("MAX(revision_repo.rev_num)");
-             if (LasRev.equals(revision)) {
+             int LasRev = Integer.parseInt(rsRev.getString("MAX(revision_repo.rev_num)"));
+             if (LasRev==revision) {
                  StringBuilder sb = new StringBuilder();
                  sb.append("success nochange");
                  response = sb.toString();
@@ -76,7 +77,7 @@ public class KCheck extends KMessage {
             }
                 
         } catch (Exception ex) {
-            Logger.getLogger(KCheck.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KCheckProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
         return response;
     }
