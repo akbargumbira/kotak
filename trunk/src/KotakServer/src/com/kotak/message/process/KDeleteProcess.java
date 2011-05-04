@@ -35,8 +35,10 @@ public class KDeleteProcess extends KMessageProcess {
             
             boolean isLocked = false;
             String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-            String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
-                    + "WHERE repository.name ='"+email+"'";
+            String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+                    + "WHERE user.email ='"+email+"' AND revision_repo.rev_num='"+last_revision+"' ";
+            String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+                    + "WHERE user.email ='"+email+"'";
 
             // Periksa email dan pass
             // Jika tidak cocok

@@ -32,8 +32,8 @@ public class KCheckProcess extends KMessageProcess {
         int revision = ((KCheck)request).getClientLastRevision();
         
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-        String queryLastRev = "SELECT revision_repo.structure, MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
-                + "WHERE repository.name ='"+email+"'";
+        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON ser.id=revision_repo.user_id"
+                + "WHERE user.email ='"+email+"'";
         
         //GAK PERLU
         /* // Periksa apakah email [email] memiliki repository [repository]
@@ -63,9 +63,12 @@ public class KCheckProcess extends KMessageProcess {
                  response = sb.toString();
              }
              else {
+                 String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+                + "WHERE user.email ='"+email+"' AND revision_repo.rev_num = '"+LasRev+"'";
+                 ResultSet rsStructure = qM.SELECT(queryLastRevStructure);
                  StringBuilder sb = new StringBuilder();
                  String structure = rsRev.getString("revision_repo.structure");
-                sb.append("success structure ").append(LasRev).append(" ").append(structure);
+                 sb.append("success structure ").append(LasRev).append(" ").append(structure);
                  response = sb.toString();
              }
             }

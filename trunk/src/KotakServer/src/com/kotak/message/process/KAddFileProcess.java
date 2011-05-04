@@ -35,13 +35,15 @@ public class KAddFileProcess extends KMessageProcess {
         String pass = request.getPass();
         int last_revision = ((KAddFile)request).getClientLastRevision();
         String path = ((KAddFile)request).getFilePath();
-       byte[] content = ((KAddFile)request).getFileContent();
-        
+        byte[] content = ((KAddFile)request).getFileContent();
+       
         
         boolean isLocked = false;
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-        String queryLastRev = "SELECT repository.id, revision_repo.structure,MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
-                + "WHERE repository.name ='"+email+"'";
+        String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+                + "WHERE user.email ='"+email+"' AND revision_repo.rev_num='"+last_revision+"'";
+        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+                + "WHERE user.email ='"+email+"'";
        
         
         // Periksa [email] [pass]

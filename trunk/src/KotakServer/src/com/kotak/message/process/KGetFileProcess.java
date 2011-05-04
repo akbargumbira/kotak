@@ -33,8 +33,8 @@ public class KGetFileProcess extends KMessageProcess {
         
         
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-        String queryStructure = "SELECT revision_repo.structure FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
-                + "WHERE repository.name ='"+email+"' AND revision_repo.rev_num = '"+revision+"'";
+        String queryStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+                + "WHERE user.email ='"+email+"' AND revision_repo.rev_num = '"+revision+"'";
         // [path] file yang direqeust, misal : progin5/kotak/Main.java
 
         // Check apakah [path] terdapat pada [repository] di revisi [revision]
