@@ -30,7 +30,6 @@ public class KDeleteProcess extends KMessageProcess {
             // Menerima pesan delete [email] [pass] [repository] [path] [client_last_revision]
             String email = request.getEmail();
             String pass = request.getPass();
-            String repository = request.getRepository();
             String path = ((KDelete)request).getFilePath();
             int last_revision = ((KDelete)request).getClientLastRevision();
             
@@ -92,10 +91,10 @@ public class KDeleteProcess extends KMessageProcess {
                         isLocked = true;
                             
                         //Create folder r(last_revision+1)
-                         File folder = new File(ServerData.baseURL+"/"+repository+"r"+(last_revision+1));
+                         File folder = new File(ServerData.baseURL+"/"+email+"r"+(last_revision+1));
                          folder.mkdir();
 
-                         String strSavePath = ServerData.baseURL+"/"+repository+"r"+(last_revision+1)+"/"+path;
+                         String strSavePath = ServerData.baseURL+"/"+email+"r"+(last_revision+1)+"/"+path;
 
                          //Ubah struktur database
                          //Ambil struktur terakhir
