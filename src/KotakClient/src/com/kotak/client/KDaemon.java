@@ -96,7 +96,8 @@ public class KDaemon extends MyThread {
         // TODO Check
         
         // Create object check
-        KCheck message = new KCheck(email, pass, email, serverPort); 
+        int revision = 0;
+        KCheck message = new KCheck(email, pass, revision); 
         
         // Send message and wait for response
         KLogger.writeln("send message : " + message);
@@ -250,7 +251,7 @@ public class KDaemon extends MyThread {
                     
                     // Set message
                     int revision = 0;
-                    KGetFile message = new KGetFile(email, pass, email, newPath, revision);
+                    KGetFile message = new KGetFile(email, pass, newPath, revision);
                     
                     // Send message and wait for response
                     KLogger.writeln("send message : " + message);
