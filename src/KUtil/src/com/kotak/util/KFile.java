@@ -28,7 +28,7 @@ public class KFile {
     }
     
     private String name;
-    private Date modified;
+    private Date lastModified;
     private KFile parent;
     
     /**
@@ -38,7 +38,7 @@ public class KFile {
 
     public KFile(String name, Date modified) {
         this.name = name;
-        this.modified = modified;
+        this.lastModified = modified;
         this.parent = null;
     }
 
@@ -115,9 +115,10 @@ public class KFile {
     /**
      * Remove file or folder
      * @param path Path of file or folder
+     * @param removeTime Parent last modified
      * @return True if success. False if not success
      */
-    public boolean removeFile(String path) {
+    public boolean removeFile(String path, Date removeTime) {
         // TODO test
         KFile file = findFile(path);
         
@@ -125,7 +126,11 @@ public class KFile {
             return false;
         }
         
+        // Remove
         file.getParent().getFiles().remove(file);
+        
+        // Modified recursive
+        file.parent.modifiedRecursive(removeTime);
         
         return true;
     }
@@ -140,8 +145,14 @@ public class KFile {
     }
 
     public void addFile(KFile file) {
+        // Add to files container
         getFiles().add(file);
-        file.setParent(this);
+        
+        // Set Parent
+        file.parent = this;
+        
+        // Modified Recursive
+        file.modifiedRecursive(lastModified);
     }
     
     /**
@@ -162,14 +173,14 @@ public class KFile {
      * @return the modified
      */
     public Date getModified() {
-        return modified;
+        return lastModified;
     }
 
     /**
      * @param modified the modified to set
      */
     public void setModified(Date modified) {
-        this.modified = modified;
+        modifiedRecursive(modified);
     }
 
     /**
@@ -227,11 +238,14 @@ public class KFile {
     public KFile getParent() {
         return parent;
     }
-
-    /**
-     * @param parent the parent to set
-     */
-    public void setParent(KFile parent) {
-        this.parent = parent;
+    
+    private void modifiedRecursive(Date date) {
+        lastModified = date;
+        
+        if (parent == null) {
+            return;
+        }
+        
+        parent.modifiedRecursive(date);
     }
 }
