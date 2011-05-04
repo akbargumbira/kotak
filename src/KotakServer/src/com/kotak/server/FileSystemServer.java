@@ -2,24 +2,20 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.kotak.util;
+package com.kotak.server;
 
-import com.sun.org.apache.bcel.internal.util.ByteSequence;
 import java.io.*;
-import java.util.ArrayList;
 
 /**
  *
  * @author user
  */
 public class FileSystemServer {
-    public static String baseURL = "";
-
     public FileSystemServer() {
     }
     
     public byte[] getFileContent(String repository, int rev_num, String path) throws FileNotFoundException, IOException {
-        String filePath = baseURL+repository;
+        String filePath = ServerData.baseURL+"/"+repository;
         
         for (int i = rev_num; i > 0; --i) {
             File res = new File(filePath + "/r" + rev_num + "/" + path);

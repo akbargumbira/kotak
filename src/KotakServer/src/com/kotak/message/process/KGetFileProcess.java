@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.server.database.QueryManagement;
-import com.kotak.util.FileSystemServer;
+import com.kotak.server.FileSystemServer;
 
 /**
  *

@@ -2,10 +2,17 @@ package com.kotak.message.process;
 
 import com.kotak.message.model.KAddFile;
 import com.kotak.message.model.KMessage;
+import com.kotak.server.ServerData;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.server.database.QueryManagement;
+import com.kotak.util.KFile;
+import com.kotak.util.KFileSystem;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Date;
 
 /**
  *
@@ -34,9 +41,9 @@ public class KAddFileProcess extends KMessageProcess {
         
         boolean isLocked = false;
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
+        String queryLastRev = "SELECT repository.id, revision_repo.structure,MAX(revision_repo.rev_num) FROM revision_repo LEFT JOIN repository ON revision_repo.repo_id=repository.id"
                 + "WHERE repository.name ='"+email+"'";
-        
+       
         
         // Periksa [email] [pass]
         // Jika tidak cocok
@@ -91,6 +98,24 @@ public class KAddFileProcess extends KMessageProcess {
                      //Tambah File
                      isLocked = true;
                      
+                     String strSavePath = ServerData.baseURL+"/"+repository+"r"+(last_revision+1)+"/"+path;
+                     byte[] contentFile = content.getBytes();
+                     KFileSystem.save(strSavePath, contentFile);
+                     
+                     //Ubah struktur database
+                     //Ambil struktur terakhir
+                     String structure = rsRev.getString("revision_repo.structure");
+                     KFile fileStructure = KFile.fromJSONString(structure);
+                     KFile fileUpdated = fileStructure.findFile(path);
+                     if (fileUpdated != null) { //file update
+                         fileUpdated.setModified(new Date(new File(strSavePath).lastModified()));
+                         String structureUpdated  = KFile.toJSON(fileStructure);
+                         //Update to database
+                         String repo_id = rsRev.getString("repository.id");
+                         INSERT INTO 
+                     } else { //new file added
+                         
+                     }
                      
                      
                      isLocked = false;
