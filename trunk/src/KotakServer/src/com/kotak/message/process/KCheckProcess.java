@@ -67,7 +67,7 @@ public class KCheckProcess extends KMessageProcess {
                 + "WHERE user.email ='"+email+"' AND revision_repo.rev_num = '"+LasRev+"'";
                  ResultSet rsStructure = qM.SELECT(queryLastRevStructure);
                  StringBuilder sb = new StringBuilder();
-                 String structure = rsRev.getString("revision_repo.structure");
+                 String structure = rsStructure.getString("revision_repo.structure");
                  sb.append("success structure ").append(LasRev).append(" ").append(structure);
                  response = sb.toString();
              }
