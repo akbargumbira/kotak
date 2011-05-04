@@ -7,6 +7,7 @@ package com.kotak.client;
 import com.kotak.client.model.KAppData;
 import com.kotak.message.model.KAddFile;
 import com.kotak.message.model.KCheck;
+import com.kotak.message.model.KDelete;
 import com.kotak.message.model.KGetFile;
 import com.kotak.message.model.KMessage;
 import com.kotak.protocol.transfer.KTPClient;
@@ -50,15 +51,15 @@ public class KShell {
                 
                 String action = part[0];
                 
-                if (action.equals("check") && part.length == 5) {
-                    message = new KCheck(part[1], part[2], part[3], Integer.parseInt(part[4]));
-                } else if (action.equals("getfile") && part.length == 6) {
-                    message = new KGetFile(part[1], part[2], part[3], part[4], Integer.parseInt(part[5]));
-                } else if(action.equals("addfile") && part.length == 6) {
+                if (action.equals("check") && part.length == 4) {
+                    message = new KCheck(part[1], part[2], Integer.parseInt(part[3]));
+                } else if (action.equals("getfile") && part.length == 5) {
+                    message = new KGetFile(part[1], part[2], part[3], Integer.parseInt(part[4]));
+                } else if(action.equals("addfile") && part.length == 5) {
                     byte[] bytes = KFileSystem.open(part[5]);
-                    message = new KAddFile(part[1], part[2], part[3], Integer.parseInt(part[4]), part[5], bytes);
+                    message = new KAddFile(part[1], part[2], Integer.parseInt(part[4]), part[5], bytes);
                 } else if (action.equals("delete") && part.length == 5) {
-                    
+                    message = new KDelete(part[1], part[2], part[3], Integer.parseInt(part[4]));
                 }
                 
                 response = ktp.sendRequest(URL, port, message);

@@ -24,8 +24,10 @@ public class KAppData implements Serializable {
     private int serverPort = 10000;
     private String workingFolderPath = "";
     protected String workingFolderName = "Kotak";
+    
     private String email;
     private String password;
+    
     private ArrayList<KRepository> repositories;
     public static KAppData instance;
     private boolean login = false;
@@ -40,10 +42,10 @@ public class KAppData implements Serializable {
         FileInputStream fis = new FileInputStream(fileName);
         ObjectInputStream ois = new ObjectInputStream(fis);
         
-        KAppData data = (KAppData)ois.readObject();
+        instance = (KAppData)ois.readObject();
         ois.close();
 
-        return data;
+        return instance;
     }
 
     public static void save(KAppData data) throws FileNotFoundException, IOException {
@@ -163,5 +165,15 @@ public class KAppData implements Serializable {
      */
     public void setWorkingFolderName(String workingFolderName) {
         this.workingFolderName = workingFolderName;
+    }
+    
+    /**
+     * Get repository path
+     * @return Repository path
+     */
+    public String getRepoPath() {
+        String repoPath = workingFolderPath + "/" + workingFolderName + "/" + email;
+        
+        return repoPath;
     }
 }
