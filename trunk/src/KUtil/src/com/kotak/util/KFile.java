@@ -76,11 +76,11 @@ public class KFile {
     /**
      * Find file or folder
      * @param path Path of file or folder to be search
-     * @return True if found. False if not found
+     * @return Corespondent object if found. Null if not found
      * 
      * Path example : progin5/tes/Main.java
      */
-    public boolean findFile(String path) {
+    public KFile findFile(String path) {
         // Clean whitespace
         path = path.trim();
         
@@ -94,14 +94,18 @@ public class KFile {
         for (int i = 0; i < size; ++i) {
             if (files.get(i).getName().equals(part[0])) {
                 if (part.length == 1) {
-                    return true;
+                    return files.get(i);
                 }
                 
                 return files.get(i).findFile(part[1]);
             }
         }
 
-        return false;
+        return null;
+    }
+    
+    public boolean isExist(String path) {
+        return findFile(path) != null;
     }
 
     public void AddFile(KFile file) {
