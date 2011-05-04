@@ -2,8 +2,13 @@ package com.kotak.message.process;
 
 import com.kotak.message.model.KDelete;
 import com.kotak.message.model.KMessage;
+import com.kotak.server.ServerData;
 import com.kotak.server.database.QueryManagement;
+import com.kotak.util.KFile;
+import com.kotak.util.KFileSystem;
+import java.io.File;
 import java.sql.ResultSet;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,8 +33,6 @@ public class KDeleteProcess extends KMessageProcess {
             String repository = request.getRepository();
             String path = ((KDelete)request).getFilePath();
             int last_revision = ((KDelete)request).getClientLastRevision();
-        
-        
             
             boolean isLocked = false;
             String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
@@ -87,9 +90,44 @@ public class KDeleteProcess extends KMessageProcess {
                     if (LasRev==last_revision) {
                         //Hapus File
                         isLocked = true;
+                            
+                        //Create folder r(last_revision+1)
+                         File folder = new File(ServerData.baseURL+"/"+repository+"r"+(last_revision+1));
+                         folder.mkdir();
 
+                         String strSavePath = ServerData.baseURL+"/"+repository+"r"+(last_revision+1)+"/"+path;
 
-
+                         //Ubah struktur database
+                         //Ambil struktur terakhir
+                         String structure = rsRev.getString("revision_repo.structure");
+                         KFile fileStructure = KFile.fromJSONString(structure);
+                         
+                         KFile fileDeleted= fileStructure.findFile(path);
+                         if (fileDeleted!=null) {
+                             //Parsing path buat dapet parent ma name
+                             String[] part = path.split("/");
+                             String fileName = part[part.length-1];
+                            
+                             fileStructure.removeFile(path);
+                             structure = KFile.toJSON(fileStructure); 
+                             //Update to database
+                             String repo_id = rsRev.getString("repository.id");
+                             String queryInsert = "INSERT INTO revision_repo ('repo_id','rev_num','structure')"
+                                     + "VALUES (' '"+repo_id+"' ',' '"+(last_revision+1)+"' ',' '"+structure+"' ')";
+                             if (qM.INSERT(queryInsert)==0) { //insert berhasil
+                                 StringBuilder sb = new StringBuilder();
+                                 sb.append("success ").append(last_revision+1);
+                                 response = sb.toString();
+                             } else {
+                                 StringBuilder sb = new StringBuilder();
+                                 sb.append("failed add_failed");
+                                 response = sb.toString();
+                             }
+                         } else {
+                             StringBuilder sb = new StringBuilder();
+                             sb.append("failed file_requested_to_deleted_not_exist");
+                             response = sb.toString();
+                         }
                         isLocked = false;
                     } else {
                         StringBuilder sb = new StringBuilder();

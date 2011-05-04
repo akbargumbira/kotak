@@ -4,11 +4,13 @@
  */
 package com.kotak.server;
 
+import com.kotak.message.process.KRegisterProcess;
 import com.kotak.message.model.KAddFile;
 import com.kotak.message.model.KCheck;
 import com.kotak.message.model.KDelete;
 import com.kotak.message.model.KGetFile;
 import com.kotak.message.model.KMessage;
+import com.kotak.message.model.KRegister;
 import com.kotak.protocol.transfer.KTPServer;
 import com.kotak.util.KThread;
 import java.io.IOException;
@@ -48,6 +50,8 @@ public class Child extends KThread {
                 response = (new KAddFileProcess(request)).run();
             } else if (request.getClass() == KDelete.class) {
                 response = (new KDeleteProcess(request)).run();
+            } else if (request.getClass() == KRegister.class) {
+                response = (new KRegisterProcess(request)).run();
             }
 
             // Send Response

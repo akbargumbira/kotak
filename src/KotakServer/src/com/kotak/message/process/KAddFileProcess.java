@@ -36,7 +36,7 @@ public class KAddFileProcess extends KMessageProcess {
         String repository = request.getRepository();
         int last_revision = ((KAddFile)request).getClientLastRevision();
         String path = ((KAddFile)request).getFilePath();
-        String content = ((KAddFile)request).getFileContent();
+       byte[] content = ((KAddFile)request).getFileContent();
         
         
         boolean isLocked = false;
@@ -103,8 +103,8 @@ public class KAddFileProcess extends KMessageProcess {
                      folder.mkdir();
                      
                      String strSavePath = ServerData.baseURL+"/"+repository+"r"+(last_revision+1)+"/"+path;
-                     byte[] contentFile = content.getBytes();
-                     KFileSystem.save(strSavePath, contentFile);
+                     
+                     KFileSystem.save(strSavePath, content);
                      
                      //Ubah struktur database
                      //Ambil struktur terakhir
