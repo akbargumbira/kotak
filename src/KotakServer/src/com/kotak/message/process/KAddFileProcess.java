@@ -126,9 +126,9 @@ public class KAddFileProcess extends KMessageProcess {
                          structureUpdated= KFile.toJSON(fileStructure);
                      }
                      //Update to database
-                     String repo_id = rsRev.getString("repository.id");
-                     String queryInsert = "INSERT INTO revision_repo ('repo_id','rev_num','structure')"
-                             + "VALUES (' '"+repo_id+"' ',' '"+(last_revision+1)+"' ',' '"+structureUpdated+"' ')";
+                     String user_id = rs.getString("id");
+                     String queryInsert = "INSERT INTO revision_repo ('user_id','rev_num','structure')"
+                             + "VALUES (' '"+user_id+"' ',' '"+(last_revision+1)+"' ',' '"+structureUpdated+"' ')";
                      if (qM.INSERT(queryInsert)==0) { //insert berhasil
                          StringBuilder sb = new StringBuilder();
                          sb.append("success ").append(last_revision+1);

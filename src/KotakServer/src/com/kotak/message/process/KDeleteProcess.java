@@ -100,7 +100,8 @@ public class KDeleteProcess extends KMessageProcess {
 
                          //Ubah struktur database
                          //Ambil struktur terakhir
-                         String structure = rsRev.getString("revision_repo.structure");
+                         ResultSet rsLastRevStructure = qM.SELECT(queryLastRevStructure);
+                         String structure = rsLastRevStructure.getString("revision_repo.structure");
                          KFile fileStructure = KFile.fromJSONString(structure);
                          
                          KFile fileDeleted= fileStructure.findFile(path);
@@ -112,9 +113,9 @@ public class KDeleteProcess extends KMessageProcess {
                              fileStructure.removeFile(path);
                              structure = KFile.toJSON(fileStructure); 
                              //Update to database
-                             String repo_id = rsRev.getString("repository.id");
-                             String queryInsert = "INSERT INTO revision_repo ('repo_id','rev_num','structure')"
-                                     + "VALUES (' '"+repo_id+"' ',' '"+(last_revision+1)+"' ',' '"+structure+"' ')";
+                             String user_id = rs.getString("id");
+                             String queryInsert = "INSERT INTO revision_repo ('user_id','rev_num','structure')"
+                                     + "VALUES (' '"+user_id+"' ',' '"+(last_revision+1)+"' ',' '"+structure+"' ')";
                              if (qM.INSERT(queryInsert)==0) { //insert berhasil
                                  StringBuilder sb = new StringBuilder();
                                  sb.append("success ").append(last_revision+1);
