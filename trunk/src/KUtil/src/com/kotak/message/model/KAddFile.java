@@ -9,6 +9,22 @@ public class KAddFile extends KMessage {
     protected String filePath;
     protected String fileContent;
 
+    public KAddFile(String email, String pass, String repository, int clientLastRevision, String filePath, String fileContent) {
+        super(email, pass, repository);
+        this.clientLastRevision = clientLastRevision;
+        this.filePath = filePath;
+        this.fileContent = fileContent;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString()).append(", clientLastRevision:")
+                .append(clientLastRevision).append(", filePath:").append(filePath);
+        
+        return sb.toString();
+    }
+    
     /**
      * @return the clientLastRevision
      */

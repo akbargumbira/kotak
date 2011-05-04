@@ -37,10 +37,6 @@ public class Main {
                 }
             });
 
-            // Start KDaemon
-            daemon = new KDaemon(KAppData.instance.getEmail(), KAppData.instance.getPassword());
-            //daemon.start();
-
         } catch (FileNotFoundException ex) {
             try {
                 KAppData.instance = new KAppData();

@@ -8,6 +8,21 @@ public class KDelete extends KMessage {
     protected String filePath;
     protected int clientLastRevision;
 
+    public KDelete(String email, String pass, String repository, String filePath, int clientLastRevision) {
+        super(email, pass, repository);
+        this.filePath = filePath;
+        this.clientLastRevision = clientLastRevision;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString()).append(", clientLastRevision:")
+                .append(clientLastRevision).append(", filePath:").append(filePath);
+        
+        return sb.toString();
+    }
+    
     /**
      * @return the filePath
      */

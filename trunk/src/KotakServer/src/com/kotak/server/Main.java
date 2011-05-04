@@ -23,10 +23,10 @@ public class Main {
         // Json Example
         KFile root = new KFile("root", (new Date()));
         KFile temp;
-        root.AddFile(new KFile("a.txt", (new Date())));
+        root.addFile(new KFile("a.txt", (new Date())));
         temp = new KFile("folder 1", (new Date()));
-        temp.AddFile(new KFile("b.txt", (new Date())));
-        root.AddFile(temp);
+        temp.addFile(new KFile("b.txt", (new Date())));
+        root.addFile(temp);
 
         System.out.println("Gson : " + (new Gson().toJson(root)));
 

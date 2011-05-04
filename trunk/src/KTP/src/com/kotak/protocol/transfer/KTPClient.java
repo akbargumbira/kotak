@@ -1,6 +1,8 @@
 package com.kotak.protocol.transfer;
 
+import com.kotak.message.model.KMessage;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -25,6 +27,26 @@ public class KTPClient extends KTP {
 
         out.write(message.getBytes());
         out.close();
+        
+        return getResponse();
+    }
+    
+    /**
+     * Send request based in object
+     * @param address Server address
+     * @param port Server port
+     * @param message Object message
+     * @return Response from server
+     * @throws UnknownHostException
+     * @throws IOException 
+     */
+    public String sendRequest(String address, int port, KMessage message) throws UnknownHostException, IOException {
+        socket = new Socket(address, port);
+        out = socket.getOutputStream();
+
+        ObjectOutputStream oos = new ObjectOutputStream(out);
+        oos.writeObject(message);
+        oos.close();
         
         return getResponse();
     }

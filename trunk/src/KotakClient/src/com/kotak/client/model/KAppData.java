@@ -22,7 +22,8 @@ public class KAppData implements Serializable {
     private static String fileName = ".kotak";
     private String serverURL = "127.0.0.1";
     private int serverPort = 10000;
-    private String workingFolder = "";
+    private String workingFolderPath = "";
+    protected String workingFolderName = "Kotak";
     private String email;
     private String password;
     private ArrayList<KRepository> repositories;
@@ -83,15 +84,15 @@ public class KAppData implements Serializable {
     /**
      * @return the workingFolder
      */
-    public String getWorkingFolder() {
-        return workingFolder;
+    public String getWorkingFolderPath() {
+        return workingFolderPath;
     }
 
     /**
-     * @param workingFolder the workingFolder to set
+     * @param workingFolderPath the workingFolder to set
      */
-    public void setWorkingFolder(String workingFolder) {
-        this.workingFolder = workingFolder;
+    public void setWorkingFolderPath(String workingFolderPath) {
+        this.workingFolderPath = workingFolderPath;
     }
 
     /**
@@ -148,5 +149,19 @@ public class KAppData implements Serializable {
      */
     public void setLogin(boolean login) {
         this.login = login;
+    }
+
+    /**
+     * @return the workingFolderName
+     */
+    public String getWorkingFolderName() {
+        return workingFolderName;
+    }
+
+    /**
+     * @param workingFolderName the workingFolderName to set
+     */
+    public void setWorkingFolderName(String workingFolderName) {
+        this.workingFolderName = workingFolderName;
     }
 }
