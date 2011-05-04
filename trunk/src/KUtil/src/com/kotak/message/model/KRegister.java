@@ -6,7 +6,7 @@ package com.kotak.message.model;
  */
 public class KRegister extends KMessage {
 
-    public KRegister(String email, String pass, String repository) {
-        super(email, pass, repository);
+    public KRegister(String email, String pass) {
+        super(email, pass);
     }
 }

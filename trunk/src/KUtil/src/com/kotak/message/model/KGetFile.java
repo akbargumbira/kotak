@@ -8,8 +8,8 @@ public class KGetFile extends KMessage {
     protected String filePath;
     protected int fileRevision;
 
-    public KGetFile(String email, String pass, String repository, String filePath, int fileRevision) {
-        super(email, pass, repository);
+    public KGetFile(String email, String pass, String filePath, int fileRevision) {
+        super(email, pass);
         this.filePath = filePath;
         this.fileRevision = fileRevision;
     }

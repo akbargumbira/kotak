@@ -8,8 +8,8 @@ public class KDelete extends KMessage {
     protected String filePath;
     protected int clientLastRevision;
 
-    public KDelete(String email, String pass, String repository, String filePath, int clientLastRevision) {
-        super(email, pass, repository);
+    public KDelete(String email, String pass, String filePath, int clientLastRevision) {
+        super(email, pass);
         this.filePath = filePath;
         this.clientLastRevision = clientLastRevision;
     }

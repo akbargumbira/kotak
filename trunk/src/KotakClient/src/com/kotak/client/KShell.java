@@ -5,7 +5,9 @@
 package com.kotak.client;
 
 import com.kotak.client.model.KAppData;
+import com.kotak.message.model.KAddFile;
 import com.kotak.message.model.KCheck;
+import com.kotak.message.model.KGetFile;
 import com.kotak.message.model.KMessage;
 import com.kotak.protocol.transfer.KTPClient;
 import com.kotak.util.KFileSystem;
@@ -14,7 +16,6 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sun.management.FileSystem;
 
 /**
  *
@@ -47,11 +48,17 @@ public class KShell {
                     continue;
                 }
                 
-                if (part[0].equals("check") && part.length == 5) {
+                String action = part[0];
+                
+                if (action.equals("check") && part.length == 5) {
                     message = new KCheck(part[1], part[2], part[3], Integer.parseInt(part[4]));
-                }
-                else if(part[0].equals("addfile") && part.length == 6) {
+                } else if (action.equals("getfile") && part.length == 6) {
+                    message = new KGetFile(part[1], part[2], part[3], part[4], Integer.parseInt(part[5]));
+                } else if(action.equals("addfile") && part.length == 6) {
                     byte[] bytes = KFileSystem.open(part[5]);
+                    message = new KAddFile(part[1], part[2], part[3], Integer.parseInt(part[4]), part[5], bytes);
+                } else if (action.equals("delete") && part.length == 5) {
+                    
                 }
                 
                 response = ktp.sendRequest(URL, port, message);

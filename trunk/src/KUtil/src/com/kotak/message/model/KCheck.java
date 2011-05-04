@@ -7,8 +7,8 @@ package com.kotak.message.model;
 public class KCheck extends KMessage {
     protected int clientLastRevision;
 
-    public KCheck(String email, String pass, String repository, int clientLastRevision) {
-        super(email, pass, repository);
+    public KCheck(String email, String pass, int clientLastRevision) {
+        super(email, pass);
         this.clientLastRevision = clientLastRevision;
     }
 

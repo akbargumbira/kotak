@@ -7,19 +7,16 @@ package com.kotak.message.model;
 public class KMessage {
     protected String email;
     protected String pass;
-    protected String repository;
 
-    public KMessage(String email, String pass, String repository) {
+    public KMessage(String email, String pass) {
         this.email = email;
         this.pass = pass;
-        this.repository = repository;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("email:").append(email).append(", pass:").append(pass)
-                .append(", repository:").append(repository);
+        sb.append("email:").append(email).append(", pass:").append(pass);
         
         return sb.toString();
     }
@@ -51,20 +48,4 @@ public class KMessage {
     public void setPass(String pass) {
         this.pass = pass;
     }
-
-    /**
-     * @return the repository
-     */
-    public String getRepository() {
-        return repository;
-    }
-
-    /**
-     * @param repository the repository to set
-     */
-    public void setRepository(String repository) {
-        this.repository = repository;
-    }
-    
-    
 }
