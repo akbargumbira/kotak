@@ -1,6 +1,8 @@
 package com.kotak.protocol.transfer;
 
+import com.kotak.message.model.KMessage;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 
 /**
@@ -20,15 +22,9 @@ public class KTPServer extends KTP {
      * @return Request from client
      * @throws IOException 
      */
-    public String getRequest() throws IOException {
-        int temp;
-        StringBuilder sb = new StringBuilder();
-
-        while((temp = in.read()) > -1) {
-            sb.append((char)temp);
-        }
-
-        return sb.toString();
+    public KMessage getRequest() throws IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(in);
+        return (KMessage) ois.readObject();
     }
 
     /**

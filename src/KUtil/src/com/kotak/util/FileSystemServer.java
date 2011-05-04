@@ -18,7 +18,7 @@ public class FileSystemServer {
     public FileSystemServer() {
     }
     
-    public static byte[] getFileContent(String repository, int rev_num, String path) throws FileNotFoundException, IOException {
+    public byte[] getFileContent(String repository, int rev_num, String path) throws FileNotFoundException, IOException {
         String filePath = baseURL+repository;
         
         for (int i = rev_num; i > 0; --i) {
