@@ -3,14 +3,17 @@ package com.kotak.client;
 import com.google.gson.Gson;
 import com.kotak.util.MyThread;
 import com.kotak.util.KLogger;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.client.model.KAppData;
 import com.kotak.message.model.KCheck;
+import com.kotak.message.model.KGetFile;
 import com.kotak.protocol.transfer.KTPClient;
 import com.kotak.util.KFile;
+import com.kotak.util.KFileSystem;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -186,31 +189,21 @@ public class KDaemon extends MyThread {
             // delete [email] [pass] [repository] [path] [last_revision]
             
             // TODO Recieva response
+            
+            // Remove in structure
+            struct.getParent().getFiles().remove(struct);
+            //server.removeFile(tempPath);
         }
     }
     
-    private boolean clientSync() {
-        // Check change in client
+    private boolean clientSync() throws FileNotFoundException, IOException {
+        // TODO Check change in client
        
         // Compare saved structure and current structure
 
-        // Foreach deleted file/folder
-            // TODO delete
-            // delete [email] [pass] [repository] [path] [last_revision]
-            // if response is failed
-                // return false
-            // else if response is success
-                // Update revision number
-                // Update structure
+        deleteInServer(repoPath, KFile.fromJSONFile(repoPath + "/.client"));
         
-        // Foreach add/updated file/folder
-            // TODO addfile
-            // msg : addfile [email] [pass] [repository] [last_revision] [path] [content]
-            // If reponse is failed
-                // return false
-            // else if response is success
-                // Update revision number
-                // Update structure
+        addToServer(repoPath, KFile.fromJSONFile(repoPath + "/.client"));
         
         return true;
     }
@@ -231,6 +224,7 @@ public class KDaemon extends MyThread {
                 deleteInClient(newPath, fileClient.getFiles().get(i), fileServer);
             } else {
                 // TODO Delete File
+                KFileSystem.delete(new File(newPath));
             }
         }
     }
@@ -253,11 +247,10 @@ public class KDaemon extends MyThread {
             if(tempFile == null || fileClient.getModified() != tempFile.getModified()) {
                 try {
                     // TODO addfile
-                    // msg : getfile [email] [pass] [repository] [path] [revision]
                     
                     // Set message
                     int revision = 0;
-                    String message = "getfile " + email + " " + pass + " " + email + " " + newPath + " " + revision;
+                    KGetFile message = new KGetFile(email, pass, email, newPath, revision);
                     
                     // Send message and wait for response
                     KLogger.writeln("send message : " + message);
@@ -272,6 +265,7 @@ public class KDaemon extends MyThread {
                     
                     if (prefix.equals("success") && part.length == 2){
                         // TODO Save File to storage
+                        KFileSystem.save(newPath, part[1].getBytes());
                     }
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);

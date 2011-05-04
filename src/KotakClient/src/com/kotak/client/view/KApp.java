@@ -3,9 +3,9 @@
  *
  * Created on Apr 30, 2011, 5:33:38 PM
  */
-
 package com.kotak.client.view;
 
+import com.kotak.client.KDaemon;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -14,6 +14,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import com.kotak.client.Main;
 import com.kotak.client.model.KAppData;
+import com.kotak.util.KFileSystem;
+import sun.management.FileSystem;
 
 /**
  *
@@ -21,11 +23,11 @@ import com.kotak.client.model.KAppData;
  */
 public class KApp extends javax.swing.JFrame {
 
-    private boolean  pressed = false;
+    private boolean pressed = false;
     private int deltaX = 0;
     private int deltaY = 0;
-
     private boolean login = false;
+    private KDaemon daemon;
 
     /** Creates new form KApp */
     public KApp() {
@@ -339,15 +341,18 @@ public class KApp extends javax.swing.JFrame {
 
         // TODO Login
         // Connect to Server
-        
+
         success = true;
-        
+
         if (success) {
             // Login is true
             login = true;
 
             // Render
             renderAccount();
+            
+            // Init Daemon
+            initDaemon();
 
             // Save Data
             saveAccountData();
@@ -359,9 +364,12 @@ public class KApp extends javax.swing.JFrame {
     private void logout() {
         // Login is false
         login = false;
-        
+
         // Render
         renderAccount();
+        
+        // Init Daemon
+        initDaemon();
 
         // Save Data
         saveAccountData();
@@ -385,7 +393,7 @@ public class KApp extends javax.swing.JFrame {
     }//GEN-LAST:event_windowDrag
 
     private void windowPress(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_windowPress
-        if(!pressed){
+        if (!pressed) {
             pressed = true;
             deltaX = evt.getXOnScreen() - this.getX();
             deltaY = evt.getYOnScreen() - this.getY();
@@ -411,30 +419,34 @@ public class KApp extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonLoginLogoutActionPerformed
 
     private void jButtonOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOpenActionPerformed
+        // Remember old path
         String oldPath = jTextFieldFolder.getText();
-                
+
         JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            // Get New Folder Path
-            String newPath = jfc.getSelectedFile().getAbsolutePath();
-
-            // Move 'Kotak' to new path
-            
-
-            // Set new Folder Path
-            KAppData.instance.setWorkingFolder(newPath);
-            jTextFieldFolder.setText(newPath);
-
-            // Save
             try {
+                // Get New Folder Path
+                String newPath = jfc.getSelectedFile().getAbsolutePath();
+
+                // Move 'Kotak' to new path
+                KFileSystem.move(KAppData.instance.getWorkingFolderName(), oldPath, newPath);
+
+                // Set new Folder Path
+                KAppData.instance.setWorkingFolderPath(newPath);
+                jTextFieldFolder.setText(newPath);
+
+                // Save
                 KAppData.save(KAppData.instance);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
         }
     }//GEN-LAST:event_jButtonOpenActionPerformed
 
@@ -465,10 +477,9 @@ public class KApp extends javax.swing.JFrame {
         Main.daemon.close();
         System.out.println("closed");
     }//GEN-LAST:event_windowClosed
-
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
 //    public static void main(String args[]) {
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
@@ -476,7 +487,6 @@ public class KApp extends javax.swing.JFrame {
 //            }
 //        });
 //    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonLoginLogout;
     private javax.swing.JButton jButtonOpen;
@@ -508,7 +518,7 @@ public class KApp extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     public void init() {
-        jTextFieldFolder.setText(KAppData.instance.getWorkingFolder());
+        jTextFieldFolder.setText(KAppData.instance.getWorkingFolderPath());
         jTextFieldURL.setText(KAppData.instance.getServerURL());
         jTextFieldPort.setText(String.valueOf(KAppData.instance.getServerPort()));
         jTextFieldEmail.setText(KAppData.instance.getEmail());
@@ -517,6 +527,23 @@ public class KApp extends javax.swing.JFrame {
 
         // Render panel accout
         renderAccount();
+
+        // Init Daemon
+        initDaemon();
     }
 
+    private void initDaemon() {
+        if (login) {
+            // Create Daemon
+            daemon = new KDaemon(jTextFieldEmail.getText(), new String(jPasswordField.getPassword()));
+
+            // Start Daemon
+            daemon.start();
+        } else {
+            if (daemon != null) {
+                // Close Daemon
+                daemon.close();
+            }
+        }
+    }
 }

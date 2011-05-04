@@ -9,6 +9,21 @@ public class KMessage {
     protected String pass;
     protected String repository;
 
+    public KMessage(String email, String pass, String repository) {
+        this.email = email;
+        this.pass = pass;
+        this.repository = repository;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("email:").append(email).append(", pass:").append(pass)
+                .append(", repository:").append(repository);
+        
+        return sb.toString();
+    }
+    
     /**
      * @return the email
      */
