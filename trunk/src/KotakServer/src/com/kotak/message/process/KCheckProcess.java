@@ -29,7 +29,6 @@ public class KCheckProcess extends KMessageProcess {
         
         String email = request.getEmail();
         String pass = request.getPass();
-        String repository = request.getRepository();
         int revision = ((KCheck)request).getClientLastRevision();
         
         String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";

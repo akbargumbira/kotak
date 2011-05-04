@@ -28,7 +28,6 @@ public class KGetFileProcess extends KMessageProcess {
         
         String email = request.getEmail();
         String pass = request.getPass();
-        String repository = request.getRepository();
         String path = ((KGetFile)request).getFilePath();
         int revision = ((KGetFile)request).getFileRevision();
         
@@ -59,7 +58,7 @@ public class KGetFileProcess extends KMessageProcess {
                     KFile file = (KFile)(new Gson()).fromJson(struct, KFile.class);
                     if (file.isExist(path)) { //file ada
                         FileSystemServer fsServer = new FileSystemServer();
-                        byte[] fileBytes = fsServer.getFileContent(repository, revision, path);
+                        byte[] fileBytes = fsServer.getFileContent(email, revision, path);
                         if (fileBytes!=null) {
                             StringBuilder sb = new StringBuilder();
                             sb.append("success").append(fileBytes);
