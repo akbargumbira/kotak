@@ -35,9 +35,9 @@ public class KDeleteProcess extends KMessageProcess {
             boolean isLocked = false;
             //String QueryAuthenticateUser, Query Last Revision Structure, and Query Last Revision
             String queryAuthenticateUser = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-            String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+            String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
                     + "WHERE user.email ='"+email+"' AND revision_repo.rev_num='"+last_revision+"' ";
-            String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+            String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
                     + "WHERE user.email ='"+email+"'";
 
             //Query Management to handle query to database :
@@ -53,6 +53,7 @@ public class KDeleteProcess extends KMessageProcess {
                     if (!isLocked) { // repository is not locked
                         // Query Last Revision from database :
                         ResultSet rsRev = qM.SELECT(queryLastRev);
+                        rsRev.next();
                         int LasRev = Integer.parseInt(rsRev.getString("MAX(revision_repo.rev_num)"));
                         
                         // Check whether revision is equal to last_revision in database or not :
@@ -68,6 +69,7 @@ public class KDeleteProcess extends KMessageProcess {
                             //Change database structure :
                             //Get Last Revision Structure
                             ResultSet rsLastRevStructure = qM.SELECT(queryLastRevStructure);
+                            rsLastRevStructure.next();
                             String structure = rsLastRevStructure.getString("revision_repo.structure");
                             
                             //Change structure to KFile

@@ -32,7 +32,7 @@ public class KCheckProcess extends KMessageProcess {
         
         //Query Authenticate User & Last Revision
         String queryAuthUser = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
                 + "WHERE user.email ='"+email+"'";
       
         //Authenticate User
@@ -44,6 +44,7 @@ public class KCheckProcess extends KMessageProcess {
             if (rs.next()) { //User is Authenticated
                 //Get Last Revision from user
                 ResultSet rsRev = qM.SELECT(queryLastRev);
+                rsRev.next();
                 int LasRev = Integer.parseInt(rsRev.getString("MAX(revision_repo.rev_num)"));
 
                 if (LasRev == revision) { // revision equal to Last Revision
@@ -51,11 +52,12 @@ public class KCheckProcess extends KMessageProcess {
                     response = sb.toString();
                 } else { // revision not equal to last revision, client need to update
                     //Query Last Revision Structure
-                    String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+                    String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
                             + "WHERE user.email ='" + email + "' AND revision_repo.rev_num = '" + LasRev + "'";
                     
                     //Get Query Result
                     ResultSet rsStructure = qM.SELECT(queryLastRevStructure);
+                    rsStructure.next();
                     String structure = rsStructure.getString("revision_repo.structure");
                     
                     sb.append("success structure ").append(LasRev).append(" ").append(structure);
