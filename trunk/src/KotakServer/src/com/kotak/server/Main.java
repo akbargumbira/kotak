@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.util.KFile;
-import com.kotak.util.KFileJSON;
 
 /**
  *
@@ -22,10 +21,14 @@ public class Main {
      */
     public static void main(String[] args) {
         // Json Example
-        KFile root = new KFile("rezanachmad@gmail.com", (new Date()));
-
-        System.out.println("Gson : " + (new Gson().toJson(root)));
-
+        KFile root = new KFile("rezanachmad@gmail.com", new Date());
+        root.addFile(new KFile("test.txt", new Date()));
+        String json = root.toJSON();
+        System.out.println("Gson : " + json);
+        
+        root = KFile.fromJSONString(json);
+        json = root.toJSON();
+        System.out.println("Gson : " + json);
         int port = 10000;
 
         try {

@@ -9,5 +9,5 @@ package com.kotak.server;
  * @author user
  */
 public class ServerData {
-    public static String baseURL = "";
+    public static String baseURL = "Kotak";
 }

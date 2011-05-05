@@ -12,6 +12,7 @@ import com.kotak.message.model.KGetFile;
 import com.kotak.message.model.KMessage;
 import com.kotak.protocol.transfer.KTPClient;
 import com.kotak.util.KFileSystem;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
