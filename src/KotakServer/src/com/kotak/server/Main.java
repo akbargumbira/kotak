@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.util.KFile;
+import com.kotak.util.KFileJSON;
 
 /**
  *
@@ -22,15 +23,15 @@ public class Main {
     public static void main(String[] args) {
         // Json Example
         KFile root = new KFile("rezanachmad@gmail.com", (new Date()));
-//        KFile temp;
-//        root.addFile(new KFile("a.txt", (new Date())));
-//        temp = new KFile("folder 1", (new Date()));
-//        temp.addFile(new KFile("b.txt", (new Date())));
-//        root.addFile(temp);
+        KFile temp;
+        root.addFile(new KFile("a.txt", (new Date())));
+        temp = new KFile("folder 1", (new Date()));
+        temp.addFile(new KFile("b.txt", (new Date())));
+        root.addFile(temp);
 
-        System.out.println("Gson : " + (new Gson().toJson(root)));
+        System.out.println("Gson : " + (new Gson().toJson((KFileJSON)root)));
 
-        int port = 7000;
+        int port = 10000;
 
         try {
             ServerSocket ss = new ServerSocket(port);
@@ -41,7 +42,7 @@ public class Main {
                 Socket socket = ss.accept();
 
                 // There is a connection, serve it!
-                //(new Child(new KTPServer(socket))).start();
+                (new Child(new KTPServer(socket))).start();
             }
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

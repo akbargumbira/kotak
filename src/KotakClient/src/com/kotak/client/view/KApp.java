@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import com.kotak.client.Main;
 import com.kotak.client.model.KAppData;
 import com.kotak.util.KFileSystem;
+import com.kotak.util.KLogger;
 import sun.management.FileSystem;
 
 /**
@@ -431,7 +432,9 @@ public class KApp extends javax.swing.JFrame {
                 String newPath = jfc.getSelectedFile().getAbsolutePath();
 
                 // Move 'Kotak' to new path
-                KFileSystem.move(KAppData.instance.getWorkingFolderName(), oldPath, newPath);
+                String folderName = KAppData.instance.getWorkingFolderName();
+                KLogger.writeln("Move " + folderName + " from " + oldPath + " to " + newPath);
+                KFileSystem.move(folderName, oldPath, newPath);
 
                 // Set new Folder Path
                 KAppData.instance.setWorkingFolderPath(newPath);
@@ -477,16 +480,7 @@ public class KApp extends javax.swing.JFrame {
         Main.daemon.close();
         System.out.println("closed");
     }//GEN-LAST:event_windowClosed
-    /**
-     * @param args the command line arguments
-     */
-//    public static void main(String args[]) {
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                new KApp().setVisible(true);
-//            }
-//        });
-//    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonLoginLogout;
     private javax.swing.JButton jButtonOpen;
@@ -535,10 +529,10 @@ public class KApp extends javax.swing.JFrame {
     private void initDaemon() {
         if (login) {
             // Create Daemon
-            daemon = new KDaemon(jTextFieldEmail.getText(), new String(jPasswordField.getPassword()));
+            daemon = new KDaemon(KAppData.instance.getEmail(), KAppData.instance.getPassword());
 
             // Start Daemon
-            daemon.start();
+            //daemon.start();
         } else {
             if (daemon != null) {
                 // Close Daemon

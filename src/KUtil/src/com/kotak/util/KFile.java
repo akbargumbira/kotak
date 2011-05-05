@@ -8,77 +8,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class KFile {
-
-    public static void main(String[] args) {
-        String tes = "ha/hi/hhu";
-        String[] part = tes.split("/", 2);
-        System.out.println(part.length);
-        System.out.println(part[0]);
-        System.out.println(part[1]);
-        KFile root = new KFile("root", new Date());
-        KFile temp;
-        root.addFile(new KFile("a.txt", new Date()));
-        temp = new KFile("folder 1", new Date());
-        temp.addFile(new KFile("b.txt", new Date()));
-        temp.addFile(new KFile("folder 2", new Date()));
-        root.addFile(temp);
-
-        System.out.println(root.findFile("folder 1folder 2"));
-    }
+public class KFile extends KFileJSON {
     
-    private String name;
-    private Date lastModified;
     private KFile parent;
-    
-    /**
-     * This object is a folder if size of <i>files</i> > 0
-     */
-    private ArrayList<KFile> files = new ArrayList<KFile>();
 
     public KFile(String name, Date modified) {
         this.name = name;
         this.lastModified = modified;
         this.parent = null;
-    }
-
-    /**
-     * Compare : may be not used :( failed
-     * @param kFile
-     * @return 
-     */
-    public boolean compare(KFile kFile) {
-        if (kFile == null) {
-            return false;
-        }
-
-        if (name.equals(kFile.getName())) {
-            // Name are equal
-
-            if (files.size() != getFiles().size()) {
-                // files size is not equal
-                return false;
-            }
-
-            if (files.isEmpty()) {
-                // This is a file
-                return true;
-            }
-
-            // This is a folder
-            int size = files.size();
-            for (int i = 0; i < size; ++i) {
-                if (!files.get(i).compare(kFile.getFiles().get(i))) {
-                    // Not equal
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        // Name not equal
-        return false;
     }
 
     /**
@@ -97,15 +34,19 @@ public class KFile {
         
         // Get size
         int size = files.size();
+        
+        // Temp
+        KFile temp;
 
         // Find
         for (int i = 0; i < size; ++i) {
-            if (files.get(i).getName().equals(part[0])) {
+            temp = (KFile) files.get(i);
+            if (temp.getName().equals(part[0])) {
                 if (part.length == 1) {
-                    return files.get(i);
+                    return temp;
                 }
                 
-                return files.get(i).findFile(part[1]);
+                return temp.findFile(part[1]);
             }
         }
 
@@ -186,7 +127,7 @@ public class KFile {
     /**
      * @return the files
      */
-    public ArrayList<KFile> getFiles() {
+    public ArrayList<KFileJSON> getFiles() {
         return files;
     }
     

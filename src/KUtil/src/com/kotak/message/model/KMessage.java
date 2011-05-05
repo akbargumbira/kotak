@@ -1,10 +1,12 @@
 package com.kotak.message.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author user
  */
-public class KMessage {
+public class KMessage implements Serializable {
     protected String email;
     protected String pass;
 

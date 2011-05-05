@@ -23,55 +23,62 @@ import java.util.logging.Logger;
  * @author user
  */
 public class KShell {
+
     Scanner in;
     String command;
     String response;
     KTPClient ktp;
     String URL;
     int port;
-    
+
     public void run() {
-        in = new Scanner(System.in);
-        command = "";
-        
-        try {
-            KAppData.instance = (KAppData)KAppData.load();
-            URL = KAppData.instance.getServerURL();
-            port = KAppData.instance.getServerPort();
-            ktp = new KTPClient();
-            KMessage message = null;
-            
-            while(true) {
-                command = in.nextLine();
-                String[] part = command.split("  *");
-                
-                if (part.length < 1) {
-                    continue;
+        while (true) {
+            in = new Scanner(System.in);
+            command = "";
+
+            try {
+                KAppData.instance = (KAppData) KAppData.load();
+                URL = KAppData.instance.getServerURL();
+                port = KAppData.instance.getServerPort();
+                ktp = new KTPClient();
+                KMessage message = null;
+
+                while (true) {
+                    command = in.nextLine();
+                    String[] part = command.split("  *");
+
+                    if (part.length < 1) {
+                        continue;
+                    }
+
+                    String action = part[0];
+
+                    if (action.equals("check") && part.length == 4) {
+                        message = new KCheck(part[1], part[2], Integer.parseInt(part[3]));
+                    } else if (action.equals("getfile") && part.length == 5) {
+                        message = new KGetFile(part[1], part[2], part[3], Integer.parseInt(part[4]));
+                    } else if (action.equals("addfile") && part.length == 5) {
+                        byte[] bytes = KFileSystem.open(KAppData.instance.getRepoPath() + "/" + part[4]);
+                        message = new KAddFile(part[1], part[2], Integer.parseInt(part[3]), part[4], bytes);
+                    } else if (action.equals("delete") && part.length == 5) {
+                        message = new KDelete(part[1], part[2], part[3], Integer.parseInt(part[4]));
+                    } else {
+                        throw new Exception("Command Not found");
+                    }
+
+                    response = ktp.sendRequest(URL, port, message);
+                    System.out.println("response : " + response);
                 }
-                
-                String action = part[0];
-                
-                if (action.equals("check") && part.length == 4) {
-                    message = new KCheck(part[1], part[2], Integer.parseInt(part[3]));
-                } else if (action.equals("getfile") && part.length == 5) {
-                    message = new KGetFile(part[1], part[2], part[3], Integer.parseInt(part[4]));
-                } else if(action.equals("addfile") && part.length == 5) {
-                    byte[] bytes = KFileSystem.open(KAppData.instance.getRepoPath() + "/" + part[5]);
-                    message = new KAddFile(part[1], part[2], Integer.parseInt(part[4]), part[5], bytes);
-                } else if (action.equals("delete") && part.length == 5) {
-                    message = new KDelete(part[1], part[2], part[3], Integer.parseInt(part[4]));
-                }
-                
-                response = ktp.sendRequest(URL, port, message);
-                System.out.println("response : " + response);
+
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(KShell.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(KShell.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(KShell.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(KShell.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(KShell.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(KShell.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(KShell.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

@@ -39,4 +39,8 @@ public class KLogger {
             java.util.logging.Logger.getLogger(KLogger.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }
+    
+    public static void writeln(Class _class, String message) {
+        writeln(_class + " : " + message);
+    }
 }
