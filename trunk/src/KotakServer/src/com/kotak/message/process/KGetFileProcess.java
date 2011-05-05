@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.server.database.QueryManagement;
 import com.kotak.server.FileSystemServer;
+import java.lang.StringBuilder;
 
 /**
  *
@@ -23,68 +24,61 @@ public class KGetFileProcess extends KMessageProcess {
     @Override
     public String  run() {
         // TODO Run
-
-        // Menerima pesan msg: getfile [email] [password] [repository] [path] [revision]
-        
+        // Message Get: getfile [email] [password] [path_revision] [revision]
         String email = request.getEmail();
         String pass = request.getPass();
         String path = ((KGetFile)request).getFilePath();
         int revision = ((KGetFile)request).getFileRevision();
         
-        
-        String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
+        //Query Authenticate User, Structure in revision :
+        String queryAuthenticateUser = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
         String queryStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
                 + "WHERE user.email ='"+email+"' AND revision_repo.rev_num = '"+revision+"'";
-        // [path] file yang direqeust, misal : progin5/kotak/Main.java
-
-        // Check apakah [path] terdapat pada [repository] di revisi [revision]
-            // Pengecekan melalui database
-
-        // Jika ada, kirim pesan : success [filecontent]
-            // File content adalah isi dari [path]
-            // Cara penelusuran : lihat dokumentasi & tanya rezan
-
-        // Jika tidak ada kirim pesan : failed [failed_msg]
-
-        QueryManagement qM;        
+       
+        //Query management to handle query to database
+        QueryManagement qM;
+        StringBuilder sb = new StringBuilder();
         try {
             qM = new QueryManagement();
-            ResultSet rs = qM.SELECT(queryPass);
-            if (rs.next()) {
+
+            //Execute query to authenticate user
+            ResultSet rs = qM.SELECT(queryAuthenticateUser);
+            if (rs.next()) { //user is authenticated
+                //Get Structure  :
+                //Execute query Structure :
                 ResultSet rsStructure = qM.SELECT(queryStructure);
-                if (rs.next()) {
-                    //File yang direquest ada
-                    String struct =  rsStructure.getString("revision_repo.structure");
-                    KFile file = (KFile)(new Gson()).fromJson(struct, KFile.class);
-                    if (file.isExist(path)) { //file ada
+                if (rs.next()) { //structure is exist
+                    //Get Structure field
+                    String struct = rsStructure.getString("revision_repo.structure");
+
+                    //Change structure to KFile :
+                    KFile file = (KFile) (new Gson()).fromJson(struct, KFile.class);
+
+                    //Check wheather requested file is exist in structure logically
+                    if (file.isExist(path)) { //file is exist
+                        //FileSystem Server to get Content
                         FileSystemServer fsServer = new FileSystemServer();
                         byte[] fileBytes = fsServer.getFileContent(email, revision, path);
-                        if (fileBytes!=null) {
-                            StringBuilder sb = new StringBuilder();
+
+                        if (fileBytes != null) { //file not null
                             sb.append("success").append(fileBytes);
                             response = sb.toString();
-                        } else { //ga ada file di server
-                            StringBuilder sb = new StringBuilder();
-                            sb.append("failed file_not_found");
+                        } else { //fie content is null
+                            sb.append("failed filecontent_is_null");
                             response = sb.toString();
                         }
-                            
-                    } else {
-                        StringBuilder sb = new StringBuilder();
+                    } else { //file is not exist
                         sb.append("failed no_such_requested_file");
                         response = sb.toString();
                     }
-                        
-                } else {
-                    StringBuilder sb = new StringBuilder();
+                } else { //structure is not exist
                     sb.append("failed no_such_structure");
                     response = sb.toString();
                 }
-            } else {
-                StringBuilder sb = new StringBuilder();
+            } else { //user is not authenticated
                 sb.append("failed email_or_pass_is_wrong");
-                response = sb.toString(); 
-            }   
+                response = sb.toString();
+            }
         } catch (Exception ex) {
             Logger.getLogger(KCheckProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
