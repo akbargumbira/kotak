@@ -23,13 +23,8 @@ public class Main {
     public static void main(String[] args) {
         // Json Example
         KFile root = new KFile("rezanachmad@gmail.com", (new Date()));
-        KFile temp;
-        root.addFile(new KFile("a.txt", (new Date())));
-        temp = new KFile("folder 1", (new Date()));
-        temp.addFile(new KFile("b.txt", (new Date())));
-        root.addFile(temp);
 
-        System.out.println("Gson : " + (new Gson().toJson((KFileJSON)root)));
+        System.out.println("Gson : " + (new Gson().toJson(root)));
 
         int port = 10000;
 
