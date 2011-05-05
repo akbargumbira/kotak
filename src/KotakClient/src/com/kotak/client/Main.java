@@ -36,6 +36,9 @@ public class Main {
                     kotak.setVisible(true);
                 }
             });
+            
+            // Start Shell
+            new KShell().run();
 
         } catch (FileNotFoundException ex) {
             try {
