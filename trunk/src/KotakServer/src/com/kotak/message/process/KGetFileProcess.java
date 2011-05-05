@@ -32,7 +32,7 @@ public class KGetFileProcess extends KMessageProcess {
         
         //Query Authenticate User, Structure in revision :
         String queryAuthenticateUser = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-        String queryStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+        String queryStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
                 + "WHERE user.email ='"+email+"' AND revision_repo.rev_num = '"+revision+"'";
        
         //Query management to handle query to database
