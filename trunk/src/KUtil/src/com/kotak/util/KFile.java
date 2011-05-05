@@ -85,6 +85,7 @@ public class KFile extends KFileJSON {
         return findFile(path) != null;
     }
 
+    // TODO addTime
     public void addFile(KFile file) {
         // Add to files container
         getFiles().add(file);
@@ -161,7 +162,24 @@ public class KFile extends KFileJSON {
      * @return  KFile object. Null if there are something error
      */
     public static KFile fromJSONString(String json) {
-        return new Gson().fromJson(json, KFile.class);
+        KFileJSON jsonFile = new Gson().fromJson(json, KFileJSON.class);
+        return toKFile(jsonFile);
+    }
+    
+    /**
+     * 
+     * @param fileJSON
+     * @return 
+     */
+    public static KFile toKFile(KFileJSON fileJSON) {
+        KFile file = new KFile(fileJSON.name, fileJSON.lastModified);
+        ArrayList<KFileJSON> files = fileJSON.files;
+        
+        for (KFileJSON temp : files) {
+            file.addFile(toKFile(temp));
+        }
+        
+        return file;
     }
     
     /**
@@ -170,7 +188,7 @@ public class KFile extends KFileJSON {
      * @return JSON string of <i>kFile</i>
      */
     public static String toJSON(KFile kFile) {
-        return new Gson().toJson(kFile);
+        return new Gson().toJson((KFileJSON)kFile);
     }
 
     /**
