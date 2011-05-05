@@ -15,6 +15,7 @@ import com.kotak.message.model.KDelete;
 import com.kotak.message.model.KGetFile;
 import com.kotak.protocol.transfer.KTPClient;
 import com.kotak.util.KFile;
+import com.kotak.util.KFileJSON;
 import com.kotak.util.KFileSystem;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,13 +58,15 @@ public class KDaemon extends MyThread {
 
             if (!fileRepo.exists()) {
                 fileRepo = new File(repoPath);
-                fileRepo.mkdir();
-                
+                if (!fileRepo.mkdir()) {
+                    throw new Exception("Can't create dir");
+                }
+
                 // Create client struct
                 FileOutputStream fos = new FileOutputStream(repoPath + "/" + ".client");
                 fos.write(new Gson().toJson(new KFile(email, new Date(fileRepo.lastModified()))).getBytes());
                 fos.close();
-                
+
                 // Create server struct
                 fos = new FileOutputStream(repoPath + "/" + ".server");
                 fos.write(new Gson().toJson(new KFile(email, new Date(fileRepo.lastModified()))).getBytes());
@@ -82,6 +85,8 @@ public class KDaemon extends MyThread {
                 }
             }
         } catch (IOException ex) {
+            Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -191,13 +196,13 @@ public class KDaemon extends MyThread {
     private void deleteInServer(String tempPath, KFile clientStruct) throws FileNotFoundException, IOException, ClassNotFoundException {
         File file = new File(tempPath);
         if (file.exists()) {
-            ArrayList<KFile> kFiles = clientStruct.getFiles();
+            ArrayList<KFileJSON> kFiles = clientStruct.getFiles();
             KFile kFile = null;
             int size = kFiles.size();
             String newPath = "";
             
             for (int i=0; i < size; ++i) {
-                kFile = kFiles.get(i);
+                kFile = (KFile) kFiles.get(i);
                 newPath = tempPath + "/" + kFile.getName();
                 deleteInServer(newPath,kFile);
             }
@@ -239,12 +244,12 @@ public class KDaemon extends MyThread {
      * @param fileServer Server structure. This is permanent to all recursive
      */
     private void deleteInClient(String tempPath, KFile fileClient, KFile fileServer) {
-        ArrayList<KFile> files = fileClient.getFiles();
+        ArrayList<KFileJSON> files = fileClient.getFiles();
         int size = files.size();
         KFile kFile;
 
         for (int i = 0; i < size; ++i) {
-            kFile = files.get(i);
+            kFile = (KFile) files.get(i);
             String newPath = tempPath + "/" + kFile.getName();
             if (fileServer.isExist(newPath)) {
                 deleteInClient(newPath, kFile, fileServer);
@@ -265,13 +270,13 @@ public class KDaemon extends MyThread {
      * @param fileServer Server structure. 
      */
     private void updateInClient(String tempPath, KFile fileClient, KFile fileServer) throws FileNotFoundException, ClassNotFoundException {
-        ArrayList<KFile> files = fileServer.getFiles();
+        ArrayList<KFileJSON> files = fileServer.getFiles();
         int size = files.size();
         KFile tempClient;
         KFile tempServer;
         
         for (int i = 0; i < size; ++i) {
-            tempServer = files.get(i);
+            tempServer = (KFile) files.get(i);
             String newPath = tempPath + "/" + tempServer.getName();
             tempClient = fileClient.findFile(newPath);
             

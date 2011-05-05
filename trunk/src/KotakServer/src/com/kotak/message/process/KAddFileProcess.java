@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import com.kotak.server.database.QueryManagement;
 import com.kotak.util.KFile;
 import com.kotak.util.KFileSystem;
+import com.kotak.util.KLogger;
 import java.io.File;
 import java.util.Date;
 
@@ -37,10 +38,12 @@ public class KAddFileProcess extends KMessageProcess {
         boolean isLocked = false;
         //Query Authenticate User, Last Revision and Last Revision Structure
         String queryAuthenticateUser = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-        String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+        String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
                 + "WHERE user.email ='"+email+"' AND revision_repo.rev_num='"+last_revision+"'";
-        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
+        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id " 
                 + "WHERE user.email ='"+email+"'";
+        
+        KLogger.writeln("queryLastRev : " + queryLastRev);
        
         //Authenticate User
         QueryManagement qM;
@@ -53,6 +56,7 @@ public class KAddFileProcess extends KMessageProcess {
                     //Check if revision is equal to last revision from database
                     //Get last revision :
                     ResultSet rsRev = qM.SELECT(queryLastRev);
+                    rsRev.next();
                     int LasRev = Integer.parseInt(rsRev.getString("MAX(revision_repo.rev_num)")); //Last Revision
                     if (LasRev == last_revision) { //Last Revision equal to last revision
                         //Add/Update File  Process :
@@ -71,6 +75,7 @@ public class KAddFileProcess extends KMessageProcess {
                         //Change database structure
                         //Get last structure from database :
                         ResultSet rsLasRevStructure = qM.SELECT(queryLastRevStructure);
+                        rsLasRevStructure.next();
                         String structure = rsLasRevStructure.getString("revision_repo.structure");
 
                         //Change structure to KFile :
