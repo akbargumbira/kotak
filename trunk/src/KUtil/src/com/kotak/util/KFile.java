@@ -190,6 +190,10 @@ public class KFile extends KFileJSON {
     public static String toJSON(KFile kFile) {
         return new Gson().toJson((KFileJSON)kFile);
     }
+    
+    public String toJSON() {
+        return toJSON(this);
+    }
 
     /**
      * @return the parent
