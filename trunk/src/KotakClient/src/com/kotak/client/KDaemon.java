@@ -64,12 +64,12 @@ public class KDaemon extends MyThread {
 
                 // Create client struct
                 FileOutputStream fos = new FileOutputStream(repoPath + "/" + ".client");
-                fos.write(new Gson().toJson(new KFile(email, new Date(fileRepo.lastModified()))).getBytes());
+                fos.write(new KFile(email, new Date(fileRepo.lastModified())).toJSON().getBytes());
                 fos.close();
 
                 // Create server struct
                 fos = new FileOutputStream(repoPath + "/" + ".server");
-                fos.write(new Gson().toJson(new KFile(email, new Date(fileRepo.lastModified()))).getBytes());
+                fos.write(new KFile(email, new Date(fileRepo.lastModified())).toJSON().getBytes());
                 fos.close();
             }
 
