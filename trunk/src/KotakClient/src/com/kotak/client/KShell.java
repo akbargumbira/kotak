@@ -56,7 +56,7 @@ public class KShell {
                 } else if (action.equals("getfile") && part.length == 5) {
                     message = new KGetFile(part[1], part[2], part[3], Integer.parseInt(part[4]));
                 } else if(action.equals("addfile") && part.length == 5) {
-                    byte[] bytes = KFileSystem.open(part[5]);
+                    byte[] bytes = KFileSystem.open(KAppData.instance.getRepoPath() + "/" + part[5]);
                     message = new KAddFile(part[1], part[2], Integer.parseInt(part[4]), part[5], bytes);
                 } else if (action.equals("delete") && part.length == 5) {
                     message = new KDelete(part[1], part[2], part[3], Integer.parseInt(part[4]));
