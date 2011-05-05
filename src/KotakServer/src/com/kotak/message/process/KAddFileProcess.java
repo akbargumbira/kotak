@@ -10,8 +10,6 @@ import com.kotak.server.database.QueryManagement;
 import com.kotak.util.KFile;
 import com.kotak.util.KFileSystem;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.Date;
 
 /**
@@ -28,9 +26,7 @@ public class KAddFileProcess extends KMessageProcess {
     public String  run() {
         response = "failed";
         // TODO AddFile
-
-        // Menerima pesan : addfile [email] [pass] [repository] [last_revision] [path] [content]#
-        
+        // Get Message : addfile [email] [pass] [last_revision] [path] [content]#
         String email = request.getEmail();
         String pass = request.getPass();
         int last_revision = ((KAddFile)request).getClientLastRevision();
@@ -39,127 +35,108 @@ public class KAddFileProcess extends KMessageProcess {
        
         
         boolean isLocked = false;
-        String queryPass = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
+        //Query Authenticate User, Last Revision and Last Revision Structure
+        String queryAuthenticateUser = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
         String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
                 + "WHERE user.email ='"+email+"' AND revision_repo.rev_num='"+last_revision+"'";
         String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id"
                 + "WHERE user.email ='"+email+"'";
        
-        
-        // Periksa [email] [pass]
-        // Jika tidak cocok
-            // kirim pesan failed email_or_pass_is_wrong
-            // return false
-
-        // Periksa repository
-        // Jika tidak ada
-            // kirim pesan failed repository_not_exist
-            // return false;
-
-        // Periksa apakah user [email] memiliki [repository]
-        // Jika tidak
-            // kirim pesan failed repository_not_owned
-            // return false;
-
-        // Periksa apakah repository dilock
-        // Jika ya
-            // kirim pesan failed repository_is_locked
-            // return false;
-
-        // Periksa revision
-        // Jika tidak sama
-            // kirim pesan failed revision_not_same
-            // return false
-
-        // Lock repostory
-        // Tambah File
-            // File ditambahkan direpository [repository] pada folder r[revision]
-            // Ubah struktur database dan update revisi
-            // Jika gagal
-                // Unlock repository
-                // kirim pesan : failed add_failed
-                // return false;
-            // Jika sukses
-                // kirim pesan : success [last_revision]
-        // Unlock repository
-
-        
-        //Cek apakah email sesuai dengan passwordnya :
-        QueryManagement qM;        
+        //Authenticate User
+        QueryManagement qM;
+        StringBuilder sb = new StringBuilder();
         try {
             qM = new QueryManagement();
-            ResultSet rs = qM.SELECT(queryPass);
-            if (rs.next()) {
-             if (!isLocked) {
-                 //Ga di lock
-                 //Periksa revisi sama ga ma last revisi
-                 ResultSet rsRev = qM.SELECT(queryLastRev);
-                 int LasRev = Integer.parseInt(rsRev.getString("MAX(revision_repo.rev_num)"));
-                 if (LasRev==last_revision) {
-                     //Tambah File
-                     isLocked = true;
-                     
-                     //Create folder r(last_revision+1)
-                     File folder = new File(ServerData.baseURL+"/"+email+"r"+(last_revision+1));
-                     folder.mkdir();
-                     
-                     String strSavePath = ServerData.baseURL+"/"+email+"r"+(last_revision+1)+"/"+path;
-                     
-                     KFileSystem.save(strSavePath, content);
-                     
-                     //Ubah struktur database
-                     //Ambil struktur terakhir
-                     String structure = rsRev.getString("revision_repo.structure");
-                     KFile fileStructure = KFile.fromJSONString(structure);
-                     KFile fileUpdated = fileStructure.findFile(path);
-                     String structureUpdated;
-                     if (fileUpdated != null) { //file update
-                         fileUpdated.setModified(new Date(new File(strSavePath).lastModified()));
-                         structureUpdated  = KFile.toJSON(fileStructure);
-                         
-                     } else { //new file added
-                         //Parsing path buat dapet parent ma name
-                         String[] part = path.split("/");
-                         String fileName = part[part.length-1];
-                         KFile fileAdded = new KFile(fileName, new Date(new File(strSavePath).lastModified()));
-                         fileStructure.findFile(path.replace("/" + fileName, "")).addFile(fileAdded);
-                         structureUpdated= KFile.toJSON(fileStructure);
-                     }
-                     //Update to database
-                     String user_id = rs.getString("id");
-                     String queryInsert = "INSERT INTO revision_repo ('user_id','rev_num','structure')"
-                             + "VALUES (' '"+user_id+"' ',' '"+(last_revision+1)+"' ',' '"+structureUpdated+"' ')";
-                     if (qM.INSERT(queryInsert)==0) { //insert berhasil
-                         StringBuilder sb = new StringBuilder();
-                         sb.append("success ").append(last_revision+1);
-                         response = sb.toString();
-                     } else {
-                         StringBuilder sb = new StringBuilder();
-                         sb.append("failed add_failed");
-                         response = sb.toString();
-                     }
-                     isLocked = false;
-                 } else {
-                     StringBuilder sb = new StringBuilder();
-                     sb.append("failed revision_not_same");
-                     response = sb.toString();
-                 }
- 
-             } else {
-                 StringBuilder sb = new StringBuilder();
-                 sb.append("failed repository_is_locked");
-                 response = sb.toString(); 
-             }
-            }
-            else {
-                StringBuilder sb = new StringBuilder();
+            ResultSet rs = qM.SELECT(queryAuthenticateUser);
+            if (rs.next()) { //User is Authenticated
+                if (!isLocked) { //Repository is not locked
+                    //Check if revision is equal to last revision from database
+                    //Get last revision :
+                    ResultSet rsRev = qM.SELECT(queryLastRev);
+                    int LasRev = Integer.parseInt(rsRev.getString("MAX(revision_repo.rev_num)")); //Last Revision
+                    if (LasRev == last_revision) { //Last Revision equal to last revision
+                        //Add/Update File  Process :
+                        isLocked = true;
+
+                        //Create folder r(last_revision+1) before add file
+                        File folder = new File(ServerData.baseURL + "/" + email + "/r" + (last_revision + 1));
+                        folder.mkdir();
+
+                        //Path to save file to server :
+                        String strSavePath = ServerData.baseURL + "/" + email + "/r" + (last_revision + 1) + "/" + path;
+
+                        //Save content as file to path in server :
+                        KFileSystem.save(strSavePath, content);
+
+                        //Change database structure
+                        //Get last structure from database :
+                        ResultSet rsLasRevStructure = qM.SELECT(queryLastRevStructure);
+                        String structure = rsLasRevStructure.getString("revision_repo.structure");
+
+                        //Change structure to KFile :
+                        KFile fileStructure = KFile.fromJSONString(structure);
+
+                        //Find file to add in the last structure
+                        KFile fileUpdated = fileStructure.findFile(path);
+                        String structureUpdated;
+
+                        //if file exist then it must be updated
+                        // if file not exist then it must be added
+                        if (fileUpdated != null) { //file update
+                            //Set date file to last modified
+                            fileUpdated.setModified(new Date(new File(strSavePath).lastModified()));
+
+                            //Get structure update from new structure :
+                            structureUpdated = KFile.toJSON(fileStructure);
+                        } else { //new file must be added
+                            //Parse path to get fileName then Parent
+                            String[] part = path.split("/");
+
+                            //Get FileName :
+                            String fileName = part[part.length - 1];
+
+                            //Create new file named fileName 
+                            KFile fileAdded = new KFile(fileName, new Date(new File(strSavePath).lastModified()));
+
+                            //add file logically in structure
+                            fileStructure.findFile(path.replace("/" + fileName, "")).addFile(fileAdded);
+
+                            //Update structure :
+                            structureUpdated = KFile.toJSON(fileStructure);
+                        }
+                        //Update new structure to database :
+                        //Get user_id :
+                        String user_id = rs.getString("id");
+
+                        //Query insert to table revision_repo :
+                        String queryInsert = "INSERT INTO revision_repo ('user_id','rev_num','structure')"
+                                + "VALUES (' '" + user_id + "' ',' '" + (last_revision + 1) + "' ',' '" + structureUpdated + "' ')";
+
+                        //Execute insert query :
+                        if (qM.INSERT(queryInsert) == 0) { //insert is succesfull
+                            sb.append("success ").append(last_revision + 1);
+                            response = sb.toString();
+                        } else { //insert is not succesfull
+                            sb.append("failed add_failed");
+                            response = sb.toString();
+                        }
+                        isLocked = false;
+                    } else { //revision is not same with last revision in database
+                        sb.append("failed revision_not_same");
+                        response = sb.toString();
+                    }
+                } else { //repository is locked
+                    sb.append("failed repository_is_locked");
+                    response = sb.toString();
+                }
+            } else { //User is not authenticated
                 sb.append("failed email_or_pass_is_wrong");
-                response = sb.toString(); 
+                response = sb.toString();
             }
-                
+
         } catch (Exception ex) {
             Logger.getLogger(KCheckProcess.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
         
         return response;
     }
