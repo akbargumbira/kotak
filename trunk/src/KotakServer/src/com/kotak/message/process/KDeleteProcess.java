@@ -110,7 +110,7 @@ public class KDeleteProcess extends KMessageProcess {
                              String[] part = path.split("/");
                              String fileName = part[part.length-1];
                             
-                             fileStructure.removeFile(path);
+                             fileStructure.removeFile(path, new Date(new File(strSavePath).lastModified()));
                              structure = KFile.toJSON(fileStructure); 
                              //Update to database
                              String user_id = rs.getString("id");
