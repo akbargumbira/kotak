@@ -46,7 +46,6 @@ public class KTPClient extends KTP {
 
         ObjectOutputStream oos = new ObjectOutputStream(out);
         oos.writeObject(message);
-        oos.close();
         
         return getResponse();
     }

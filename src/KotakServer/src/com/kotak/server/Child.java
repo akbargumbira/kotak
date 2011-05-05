@@ -9,7 +9,6 @@ import com.kotak.message.model.KCheck;
 import com.kotak.message.model.KDelete;
 import com.kotak.message.model.KGetFile;
 import com.kotak.message.model.KMessage;
-import com.kotak.message.model.KRegister;
 import com.kotak.protocol.transfer.KTPServer;
 import com.kotak.util.KThread;
 import java.io.IOException;
@@ -19,6 +18,7 @@ import com.kotak.message.process.KAddFileProcess;
 import com.kotak.message.process.KCheckProcess;
 import com.kotak.message.process.KDeleteProcess;
 import com.kotak.message.process.KGetFileProcess;
+import com.kotak.util.KLogger;
 
 /**
  *
@@ -52,6 +52,7 @@ public class Child extends KThread {
             } 
 
             // Send Response
+            KLogger.writeln("Send response : " + response);
             ktp.sendResponse(response);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Child.class.getName()).log(Level.SEVERE, null, ex);

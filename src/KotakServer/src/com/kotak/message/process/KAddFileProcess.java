@@ -11,6 +11,8 @@ import com.kotak.util.KFile;
 import com.kotak.util.KFileSystem;
 import com.kotak.util.KLogger;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -25,30 +27,31 @@ public class KAddFileProcess extends KMessageProcess {
 
     @Override
     public String  run() {
-        response = "failed";
-        // TODO AddFile
-        // Get Message : addfile [email] [pass] [last_revision] [path] [content]#
-        String email = request.getEmail();
-        String pass = request.getPass();
-        int last_revision = ((KAddFile)request).getClientLastRevision();
-        String path = ((KAddFile)request).getFilePath();
-        byte[] content = ((KAddFile)request).getFileContent();
-       
-        
-        boolean isLocked = false;
-        //Query Authenticate User, Last Revision and Last Revision Structure
-        String queryAuthenticateUser = "SELECT * FROM user WHERE email = '"+email+"' AND password = '"+pass+ "'";
-        String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
-                + "WHERE user.email ='"+email+"' AND revision_repo.rev_num='"+last_revision+"'";
-        String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id " 
-                + "WHERE user.email ='"+email+"'";
-        
-        KLogger.writeln("queryLastRev : " + queryLastRev);
-       
-        //Authenticate User
-        QueryManagement qM;
-        StringBuilder sb = new StringBuilder();
         try {
+            response = "failed";
+            // TODO AddFile
+            // Get Message : addfile [email] [pass] [last_revision] [path] [content]#
+            String email = request.getEmail();
+            String pass = request.getPass();
+            int last_revision = ((KAddFile) request).getClientLastRevision();
+            String path = ((KAddFile) request).getFilePath();
+            byte[] content = ((KAddFile) request).getFileContent();
+
+
+            boolean isLocked = false;
+            //Query Authenticate User, Last Revision and Last Revision Structure
+            String queryAuthenticateUser = "SELECT * FROM user WHERE email = '" + email + "' AND password = '" + pass + "'";
+            String queryLastRevStructure = "SELECT revision_repo.structure FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
+                    + "WHERE user.email ='" + email + "' AND revision_repo.rev_num='" + last_revision + "'";
+            String queryLastRev = "SELECT MAX(revision_repo.rev_num) FROM user LEFT JOIN revision_repo ON user.id=revision_repo.user_id "
+                    + "WHERE user.email ='" + email + "'";
+
+            KLogger.writeln("queryLastRev : " + queryLastRev);
+
+            //Authenticate User
+            QueryManagement qM;
+            StringBuilder sb = new StringBuilder();
+
             qM = new QueryManagement();
             ResultSet rs = qM.SELECT(queryAuthenticateUser);
             if (rs.next()) { //User is Authenticated
@@ -64,7 +67,7 @@ public class KAddFileProcess extends KMessageProcess {
 
                         //Create folder r(last_revision+1) before add file
                         File folder = new File(ServerData.baseURL + "/" + email + "/r" + (last_revision + 1));
-                        folder.mkdir();
+                        folder.mkdirs();
 
                         //Path to save file to server :
                         String strSavePath = ServerData.baseURL + "/" + email + "/r" + (last_revision + 1) + "/" + path;
@@ -101,10 +104,15 @@ public class KAddFileProcess extends KMessageProcess {
                             String fileName = part[part.length - 1];
 
                             //Create new file named fileName 
-                            KFile fileAdded = new KFile(fileName, new Date(new File(strSavePath).lastModified()));
+                            KFile fileAdded = new KFile(fileName, new Date(new File(ServerData.baseURL + "/" + email).lastModified()));
 
                             //add file logically in structure
-                            fileStructure.findFile(path.replace("/" + fileName, "")).addFile(fileAdded);
+                            String parentPath = path.replace("/" + fileName, "");
+                            if (parentPath == null ? path == null : parentPath.equals(path)) {
+                                fileStructure.addFile(fileAdded);
+                            } else {
+                                fileStructure.findFile(parentPath).addFile(fileAdded);
+                            }
 
                             //Update structure :
                             structureUpdated = KFile.toJSON(fileStructure);
@@ -114,11 +122,13 @@ public class KAddFileProcess extends KMessageProcess {
                         String user_id = rs.getString("id");
 
                         //Query insert to table revision_repo :
-                        String queryInsert = "INSERT INTO revision_repo ('user_id','rev_num','structure')"
-                                + "VALUES (' '" + user_id + "' ',' '" + (last_revision + 1) + "' ',' '" + structureUpdated + "' ')";
+                        String queryInsert = "INSERT INTO revision_repo (`user_id`,`rev_num`,`structure`) "
+                                + "VALUES('" + user_id + "', '" + (last_revision + 1) + "', '" + structureUpdated + "')";
+
+                        KLogger.writeln("query insert : " + queryInsert);
 
                         //Execute insert query :
-                        if (qM.INSERT(queryInsert) == 0) { //insert is succesfull
+                        if (qM.INSERT(queryInsert) == 1) { //insert is succesfull
                             sb.append("success ").append(last_revision + 1);
                             response = sb.toString();
                         } else { //insert is not succesfull
@@ -138,9 +148,12 @@ public class KAddFileProcess extends KMessageProcess {
                 sb.append("failed email_or_pass_is_wrong");
                 response = sb.toString();
             }
-
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(KAddFileProcess.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(KAddFileProcess.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
-            Logger.getLogger(KCheckProcess.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KAddFileProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return response;

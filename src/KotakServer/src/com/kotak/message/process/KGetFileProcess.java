@@ -1,6 +1,5 @@
 package com.kotak.message.process;
 import com.google.gson.Gson;
-import com.kotak.message.model.KCheck;
 import com.kotak.message.model.KGetFile;
 import com.kotak.message.model.KMessage;
 import com.kotak.util.KFile;
@@ -9,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.server.database.QueryManagement;
 import com.kotak.server.FileSystemServer;
-import java.lang.StringBuilder;
 
 /**
  *
@@ -47,12 +45,12 @@ public class KGetFileProcess extends KMessageProcess {
                 //Get Structure  :
                 //Execute query Structure :
                 ResultSet rsStructure = qM.SELECT(queryStructure);
-                if (rs.next()) { //structure is exist
+                if (rsStructure.next()) { //structure is exist
                     //Get Structure field
                     String struct = rsStructure.getString("revision_repo.structure");
 
                     //Change structure to KFile :
-                    KFile file = (KFile) (new Gson()).fromJson(struct, KFile.class);
+                    KFile file = KFile.fromJSONString(struct);
 
                     //Check wheather requested file is exist in structure logically
                     if (file.isExist(path)) { //file is exist
@@ -61,7 +59,7 @@ public class KGetFileProcess extends KMessageProcess {
                         byte[] fileBytes = fsServer.getFileContent(email, revision, path);
 
                         if (fileBytes != null) { //file not null
-                            sb.append("success").append(fileBytes);
+                            sb.append("success ").append(fileBytes);
                             response = sb.toString();
                         } else { //fie content is null
                             sb.append("failed filecontent_is_null");

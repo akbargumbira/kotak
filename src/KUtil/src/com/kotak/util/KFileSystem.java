@@ -124,11 +124,15 @@ public class KFileSystem {
     public static void save(String path, byte[] content) throws FileNotFoundException, IOException {
         File file = new File(path);
         
-        if (file.exists()) {
-            FileOutputStream fos = new FileOutputStream(file, false);
-            fos.write(content);
-            fos.close();
+        if (!file.exists()) {
+            if(!file.createNewFile()) {
+                throw new IOException("Can't create file " + path);
+            }
         }
+        
+        FileOutputStream fos = new FileOutputStream(file, false);
+        fos.write(content);
+        fos.close();
     }
     
     /**
@@ -142,15 +146,13 @@ public class KFileSystem {
         byte[] bytes = null;
         File file = new File(path);
         
-        if (file.exists()) {
-            FileInputStream fis = new FileInputStream(file);
-            
-            // Create buffer
-            bytes = new byte[(int)file.length()];
-            
-            // Read
-            fis.read(bytes);
-        }
+        FileInputStream fis = new FileInputStream(file);
+
+        // Create buffer
+        bytes = new byte[(int)file.length()];
+
+        // Read
+        fis.read(bytes);
         
         return bytes;
     }

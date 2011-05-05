@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 
 public class KFile extends KFileJSON {
     
@@ -128,7 +129,7 @@ public class KFile extends KFileJSON {
     /**
      * @return the files
      */
-    public ArrayList<KFileJSON> getFiles() {
+    public LinkedList<KFileJSON> getFiles() {
         return files;
     }
     
@@ -173,7 +174,7 @@ public class KFile extends KFileJSON {
      */
     public static KFile toKFile(KFileJSON fileJSON) {
         KFile file = new KFile(fileJSON.name, fileJSON.lastModified);
-        ArrayList<KFileJSON> files = fileJSON.files;
+        LinkedList<KFileJSON> files = fileJSON.files;
         
         for (KFileJSON temp : files) {
             file.addFile(toKFile(temp));

@@ -44,6 +44,5 @@ public class KTPServer extends KTP {
     public void sendResponse(byte[] bytes) throws IOException {
         out.write(bytes);
         out.close();
-        socket.close();
     }
 }

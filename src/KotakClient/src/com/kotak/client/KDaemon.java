@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 
 /**
  *
@@ -196,7 +197,7 @@ public class KDaemon extends MyThread {
     private void deleteInServer(String tempPath, KFile clientStruct) throws FileNotFoundException, IOException, ClassNotFoundException {
         File file = new File(tempPath);
         if (file.exists()) {
-            ArrayList<KFileJSON> kFiles = clientStruct.getFiles();
+            LinkedList<KFileJSON> kFiles = clientStruct.getFiles();
             KFile kFile = null;
             int size = kFiles.size();
             String newPath = "";
@@ -244,7 +245,7 @@ public class KDaemon extends MyThread {
      * @param fileServer Server structure. This is permanent to all recursive
      */
     private void deleteInClient(String tempPath, KFile fileClient, KFile fileServer) {
-        ArrayList<KFileJSON> files = fileClient.getFiles();
+        LinkedList<KFileJSON> files = fileClient.getFiles();
         int size = files.size();
         KFile kFile;
 
@@ -270,7 +271,7 @@ public class KDaemon extends MyThread {
      * @param fileServer Server structure. 
      */
     private void updateInClient(String tempPath, KFile fileClient, KFile fileServer) throws FileNotFoundException, ClassNotFoundException {
-        ArrayList<KFileJSON> files = fileServer.getFiles();
+        LinkedList<KFileJSON> files = fileServer.getFiles();
         int size = files.size();
         KFile tempClient;
         KFile tempServer;

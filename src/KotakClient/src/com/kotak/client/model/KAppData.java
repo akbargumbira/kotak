@@ -172,7 +172,13 @@ public class KAppData implements Serializable {
      * @return Repository path
      */
     public String getRepoPath() {
-        String repoPath = workingFolderPath + "/" + workingFolderName + "/" + email;
+        String repoPath;
+        
+        if ("".equals(workingFolderPath)) {
+            repoPath = workingFolderName + "/" + email;
+        } else {
+            repoPath = workingFolderPath + "/" + workingFolderName + "/" + email;
+        }
         
         return repoPath;
     }
