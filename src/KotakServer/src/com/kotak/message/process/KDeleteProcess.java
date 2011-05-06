@@ -78,8 +78,11 @@ public class KDeleteProcess extends KMessageProcess {
                             //Delete file in filestructure :
                             KFile fileDeleted = fileStructure.findFile(path);
                             if (fileDeleted != null) { //fileDeleted is exist
-                                // Pake parentnya lah.
-                                fileStructure.removeFile(path, new Date(new File(ServerData.baseURL + "/" + email).lastModified()));
+                                // Modified
+                                Date modified = new Date(new File(ServerData.baseURL + "/" + email).lastModified());
+                                
+                                // Remove
+                                fileStructure.removeFile(path, modified);
                                 
                                 //Change new filestructure to JSON :
                                 structure = KFile.toJSON(fileStructure);
@@ -94,7 +97,7 @@ public class KDeleteProcess extends KMessageProcess {
                                 
                                 //Execute Query
                                 if (qM.INSERT(queryInsert) == 1) { //Insert is sucessfull
-                                    sb.append("success ").append(last_revision + 1);
+                                    sb.append("success ").append(last_revision + 1).append(" ").append(modified);
                                     response = sb.toString();
                                 } else { //Insert is not sucessfull
                                     sb.append("failed add_failed");

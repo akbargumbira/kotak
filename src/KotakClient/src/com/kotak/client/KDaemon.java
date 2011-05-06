@@ -1,6 +1,5 @@
 package com.kotak.client;
 
-import com.google.gson.Gson;
 import com.kotak.util.MyThread;
 import com.kotak.util.KLogger;
 import java.io.FileNotFoundException;
@@ -10,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.kotak.client.model.KAppData;
 import com.kotak.client.model.KRevision;
+import com.kotak.message.model.KAddFile;
 import com.kotak.message.model.KCheck;
 import com.kotak.message.model.KDelete;
 import com.kotak.message.model.KGetFile;
@@ -19,9 +19,9 @@ import com.kotak.util.KFileJSON;
 import com.kotak.util.KFileSystem;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 /**
  *
@@ -40,51 +40,57 @@ public class KDaemon extends MyThread {
     private String pass;
     
     private KTPClient ktp;
+    private KFile structClient;
+    private KFile structServer;
 
     public KDaemon(String email, String pass) {
         this.email = email;
         this.pass = pass;
-        serverURL = KAppData.instance.getServerURL();
-        serverPort = KAppData.instance.getServerPort();
+        serverURL = KAppData.getInstance().getServerURL();
+        serverPort = KAppData.getInstance().getServerPort();
     }
 
     @Override
     public void start() {
         try {
             // TODO Check Kotak directory
-            workingFolderPath = KAppData.instance.getWorkingFolderPath();
-            workingFolderName = KAppData.instance.getWorkingFolderName();
-            repoPath = KAppData.instance.getRepoPath();
+            workingFolderPath = KAppData.getInstance().getWorkingFolderPath();
+            workingFolderName = KAppData.getInstance().getWorkingFolderName();
+            repoPath = KAppData.getInstance().getRepoPath();
             File fileRepo = new File(repoPath);
 
             if (!fileRepo.exists()) {
                 fileRepo = new File(repoPath);
-                if (!fileRepo.mkdir()) {
+                if (!fileRepo.mkdirs()) {
                     throw new Exception("Can't create dir");
                 }
 
                 // Create client struct
-                FileOutputStream fos = new FileOutputStream(repoPath + "/" + ".client");
-                fos.write(new KFile(email, new Date(fileRepo.lastModified())).toJSON().getBytes());
+                FileOutputStream fos = new FileOutputStream(repoPath + "/" + ".client", false);
+                fos.write(new KFile(email, new Date(fileRepo.lastModified()), false).toJSON().getBytes());
                 fos.close();
 
                 // Create server struct
-                fos = new FileOutputStream(repoPath + "/" + ".server");
-                fos.write(new KFile(email, new Date(fileRepo.lastModified())).toJSON().getBytes());
+                fos = new FileOutputStream(repoPath + "/" + ".server", false);
+                fos.write(new KFile(email, new Date(fileRepo.lastModified()), false).toJSON().getBytes());
                 fos.close();
+                
+                // Revision
+                KRevision.setRevision(0);
             }
 
+            // Init
             ktp = new KTPClient();
-            // TODO Start KDaemon
-            while (loop) {
-                try {
-                    syncRepository();
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            
+            // Struct server in client
+            structServer = KFile.fromJSONFile(repoPath + "/.server");
+            
+            // Struct client
+            structClient = KFile.fromJSONFile(repoPath + "/.client");
+            
+            // Start Sync
+            syncRepositoryDebug();
+            
         } catch (IOException ex) {
             Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
@@ -92,17 +98,63 @@ public class KDaemon extends MyThread {
         }
     }
     
+    private void saveStructClient() throws FileNotFoundException, IOException {
+        // Create client struct
+        FileOutputStream fos = new FileOutputStream(repoPath + "/" + ".client", false);
+        fos.write(structClient.toJSON().getBytes());
+        fos.close();
+    }
+    
+    private void saveStructServer() throws FileNotFoundException, IOException {
+        // Create server struct
+        FileOutputStream fos = new FileOutputStream(repoPath + "/" + ".server", false);
+        fos.write(structServer.toJSON().getBytes());
+        fos.close();
+    }
+    
     private void syncRepository() throws FileNotFoundException, ClassNotFoundException {
-        try {
-            // TODO Synchronize server
-            serverSync();
+        while (true) {
+            try {
+                // TODO Synchronize server
+                serverSync();
 
-            // TODO Synchronize client
-            clientSync();
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
+                // TODO Synchronize client
+                clientSync();
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    private void syncRepositoryDebug() throws FileNotFoundException, ClassNotFoundException, Exception {
+        Scanner in;
+        String command = "";
+        boolean finish = false;
+        while (!finish) {
+            try {
+                // Get Command
+                System.out.println("server | client");
+                in = new Scanner(System.in);
+                command = in.nextLine();
+
+                if ("server".equals(command)) {
+                    // TODO Synchronize server
+                    serverSync();
+                } else if ("client".equals(command)) {
+                    // TODO Synchronize client
+                    clientSync();
+                } else if ("break".equals(command)) {
+                    finish = true;
+                } else {
+                    throw new Exception("Command not found.");
+                }
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -119,13 +171,16 @@ public class KDaemon extends MyThread {
         KLogger.writeln("response : " + response);
         
         // Split the response
-        String[] part = response.split(" ", 3);
+        KLogger.writeln("Split response");
+        String[] part = response.split(" ", 4);
         
         // Get prefix
         String prefix = (part != null && part.length > 0) ? part[0] : "";
+        KLogger.writeln("prefix : " + prefix);
         
         // Response is a structure?
         boolean isStructure = (part != null && part.length > 1 && part[1].equals("structure"));
+        KLogger.writeln("is structure : " + isStructure);
         
         if(prefix.equals("success") && isStructure && part.length == 4 ) {
             // Get revision
@@ -134,25 +189,42 @@ public class KDaemon extends MyThread {
             // Get structure form response
             String json = part[3];
             
-            // Struct in client
-            KFile client = KFile.fromJSONFile(repoPath + "/.server");
-            
             // Struct from server
             KFile server = KFile.fromJSONString(json);
 
             // TODO Delete 
-            deleteInClient(email, client, server);
+            KLogger.writeln("delete in client");
+            deleteInClient("", structServer, server);
 
             // TODO Update
-            updateInClient(email, client, server);
+            updateInClient("", server, revision);
             
-            // Save Revision
+            // Save All
             KRevision.setRevision(revision);
+            KLogger.writeln("revision : " + revision);
         }
+        
+        KLogger.writeln("struct client : " + structClient.getTree());
+        KLogger.writeln("struct server : " + structServer.getTree());
+        saveStructClient();
+        saveStructServer();
 
         return true;
     }
-
+    
+    private void addFile(String path) throws FileNotFoundException, IOException, ClassNotFoundException {
+        // Get content of file
+        byte[] bytes = KFileSystem.open(repoPath + "/" + path);
+        
+        // Make message
+        KAddFile addFile = new KAddFile(email, pass, KRevision.getRevision(), path, bytes);
+        
+        // Send Message and wait for respon
+        String response = ktp.sendRequest(serverURL, serverPort, addFile);
+        
+        
+    }
+    
     /**
      * 
      * @param currentPath
@@ -192,17 +264,20 @@ public class KDaemon extends MyThread {
     /**
      * Request for delete file / folder in Server
      * @param tempPath
-     * @param clientStruct 
+     * @param structClient 
      */
-    private void deleteInServer(String tempPath, KFile clientStruct) throws FileNotFoundException, IOException, ClassNotFoundException {
-        File file = new File(tempPath);
+    private void deleteInServer(String tempPath, KFile structClient) throws FileNotFoundException, IOException, ClassNotFoundException {
+        File file = new File(repoPath + "/" + tempPath);
+        if ("".equals(tempPath)) {
+            file = new File(repoPath);
+        }
+        
         if (file.exists()) {
-            LinkedList<KFileJSON> kFiles = clientStruct.getFiles();
+            LinkedList<KFileJSON> kFiles = structClient.getFiles();
             KFile kFile = null;
-            int size = kFiles.size();
             String newPath = "";
             
-            for (int i=0; i < size; ++i) {
+            for (int i=0; i < kFiles.size(); ++i) {
                 kFile = (KFile) kFiles.get(i);
                 newPath = tempPath + "/" + kFile.getName();
                 deleteInServer(newPath,kFile);
@@ -217,12 +292,13 @@ public class KDaemon extends MyThread {
             KLogger.writeln(response);
             
             // TODO Parse response
+            // Get time and revision
             
             // TODO Remove in structure client
-            clientStruct.getParent().getFiles().remove(clientStruct);
+            structClient.getParent().getFiles().remove(structClient);
             
             // TODO Remove in structure server
-            clientStruct.getParent().getFiles().remove(clientStruct);
+            structClient.getParent().getFiles().remove(structClient);
         }
     }
     
@@ -241,25 +317,40 @@ public class KDaemon extends MyThread {
     /**
      * Delete file or folder in Client that not in Server
      * @param tempPath
-     * @param fileClient Client structure.
+     * @param fileClient Server structure in client.
      * @param fileServer Server structure. This is permanent to all recursive
      */
     private void deleteInClient(String tempPath, KFile fileClient, KFile fileServer) {
         LinkedList<KFileJSON> files = fileClient.getFiles();
-        int size = files.size();
-        KFile kFile;
+        KFile tempClient;
+        KFile tempServer;
+        KFile tempServerParent;
 
-        for (int i = 0; i < size; ++i) {
-            kFile = (KFile) files.get(i);
-            String newPath = tempPath + "/" + kFile.getName();
-            if (fileServer.isExist(newPath)) {
-                deleteInClient(newPath, kFile, fileServer);
+        for (int i = 0; i < files.size(); ++i) {
+            tempClient = (KFile) files.get(i);
+            
+            String newPath;
+            if ("".equals(tempPath)) {
+                newPath = tempClient.getName();
+            } else {
+                newPath = tempPath + "/" + tempClient.getName();
+            }
+            
+            tempServer = fileServer.findFile(newPath);
+            tempServerParent = fileServer.findFile(tempPath);
+            if("".equals(tempPath)) {
+                tempServerParent = fileServer;
+            }
+            if (tempServer != null) {
+                deleteInClient(newPath, tempClient, fileServer);
             } else {
                 // Delete File in Storage
-                KFileSystem.delete(new File(newPath));
+                KFileSystem.delete(new File(KAppData.getInstance().getRepoPath() + "/" + newPath));
+                File file = new File(KAppData.getInstance().getRepoPath() + "/" + tempPath);
                 
                 // Delete File in Structure
-                kFile.getParent().removeFile(kFile.getName(), new Date(new File(tempPath).lastModified()));
+                structServer.removeFile(newPath, tempServerParent.getModified());
+                structClient.removeFile(newPath, new Date(file.lastModified()));
             }
         }
     }
@@ -267,10 +358,10 @@ public class KDaemon extends MyThread {
     /**
      * Get file from Server that not in Client
      * @param tempPath
-     * @param fileClient Client structure. This is permanent to all recursive
+     * @param structServer Client structure. This is permanent to all recursive
      * @param fileServer Server structure. 
      */
-    private void updateInClient(String tempPath, KFile fileClient, KFile fileServer) throws FileNotFoundException, ClassNotFoundException {
+    private void updateInClient(String tempPath, KFile fileServer, int revision) throws FileNotFoundException, ClassNotFoundException {
         LinkedList<KFileJSON> files = fileServer.getFiles();
         int size = files.size();
         KFile tempClient;
@@ -278,35 +369,71 @@ public class KDaemon extends MyThread {
         
         for (int i = 0; i < size; ++i) {
             tempServer = (KFile) files.get(i);
-            String newPath = tempPath + "/" + tempServer.getName();
-            tempClient = fileClient.findFile(newPath);
+            
+            String newPath = tempPath +"/" + tempServer.getName();
+            if ("".equals(tempPath)) {
+                newPath = tempServer.getName();
+            }
+            
+            KLogger.writeln("temp path : "  + tempPath);
+            KLogger.writeln("new path : "  + newPath);
+            
+            tempClient = structServer.findFile(newPath);
             
             if(tempClient == null || tempServer.getModified() != tempClient.getModified()) {
                 try {
-                    // TODO addfile
-                    
-                    // Set message
-                    int revision = KRevision.getRevision();
-                    KGetFile message = new KGetFile(email, pass, newPath, revision);
-                    
-                    // Send message and wait for response
-                    KLogger.writeln("send message : " + message);
-                    String response = ktp.sendRequest(serverURL, serverPort, message);
-                    KLogger.writeln("response : " + response);
-                    
-                    // Split the respons
-                    String[] part = response.split(" ", 2);
-                    
-                    //Prefix
-                    String prefix = (part != null && part.length > 0) ? part[0] : "";
-                    
-                    if (prefix.equals("success") && part.length == 2){
-                        // TODO Save File to storage
-                        KFileSystem.save(newPath, part[1].getBytes());
+                    if (tempServer.isDir()) {
+                        KLogger.writeln(tempServer.getName() + " is a directory");
                         
-                        // TODO Add file in structure
-                        fileClient.removeFile(newPath, new Date(new File(tempPath).lastModified()));
-                        fileClient.findFile(tempPath).addFile(tempServer);
+                        // Create directory
+                        File dir = new File(KAppData.getInstance().getRepoPath() + "/" + tempPath, tempServer.getName());
+                        dir.mkdir();
+                        KLogger.writeln("Create directory " + tempServer.getName() + " is success");
+                        
+                        // Add to file logically
+                        structServer.mkdirs(newPath, tempServer.getModified());
+                        structClient.mkdirs(newPath, new Date(dir.lastModified()));
+                        KLogger.writeln("struct server : " + structServer.getTree());
+                        KLogger.writeln("struct client : " + structClient.getTree());
+                        
+                        // Update again
+                        updateInClient(newPath, tempServer, revision);
+                    } else {
+                        KLogger.writeln(tempServer.getName() + " is a file");
+                        // TODO addfile
+
+                        // Set message
+                        KGetFile message = new KGetFile(email, pass, newPath, revision);
+
+                        // Send message and wait for response
+                        KLogger.writeln("send message : " + message);
+                        String response = ktp.sendRequest(serverURL, serverPort, message);
+                        KLogger.writeln("response : " + response);
+
+                        // Split the respons
+                        String[] part = response.split(" ", 2);
+
+                        //Prefix
+                        String prefix = (part != null && part.length > 0) ? part[0] : "";
+                        KLogger.writeln("prefix : " + prefix);
+
+                        if (prefix.equals("success") && part.length == 2){
+                            // TODO Save File to storage
+                            KFileSystem.save(KAppData.getInstance().getRepoPath() + "/" +  newPath, part[1].getBytes());
+                            
+                            // File
+                            File file = new File(KAppData.getInstance().getRepoPath() + "/" +  newPath) ;
+
+                            // TODO Add file in structure
+                            structServer.removeFile(newPath, new Date(new File(tempPath).lastModified()));
+                            if (!"".equals(tempPath)) {
+                                structServer.findFile(tempPath).addFile(tempServer);
+                                structClient.findFile(tempPath).addFile(new KFile(tempServer.getName(), new Date(file.lastModified()), true));
+                            } else {
+                                structServer.addFile(tempServer);
+                                structClient.addFile(new KFile(tempServer.getName(), new Date(file.lastModified()), true));
+                            }
+                        }
                     }
                 } catch (UnknownHostException ex) {
                     Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
@@ -314,7 +441,7 @@ public class KDaemon extends MyThread {
                     Logger.getLogger(KDaemon.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                updateInClient(newPath, fileClient, tempServer);
+                updateInClient(newPath, tempServer, revision);
             }
         }
     }

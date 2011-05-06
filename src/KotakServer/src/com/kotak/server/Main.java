@@ -1,6 +1,5 @@
 package com.kotak.server;
 
-import com.google.gson.Gson;
 import com.kotak.protocol.transfer.KTPServer;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -21,8 +20,8 @@ public class Main {
      */
     public static void main(String[] args) {
         // Json Example
-        KFile root = new KFile("rezanachmad@gmail.com", new Date());
-        root.addFile(new KFile("test.txt", new Date()));
+        KFile root = new KFile("rezanachmad@gmail.com", new Date(), false);
+        root.addFile(new KFile("test.txt", new Date(), true));
         String json = root.toJSON();
         System.out.println("Gson : " + json);
         

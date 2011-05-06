@@ -376,11 +376,11 @@ public class KApp extends javax.swing.JFrame {
     }
 
     private void saveAccountData() {
-        KAppData.instance.setLogin(login);
-        KAppData.instance.setUsername(jTextFieldEmail.getText());
-        KAppData.instance.setPassword(new String(jPasswordField.getPassword()));
+        KAppData.getInstance().setLogin(login);
+        KAppData.getInstance().setUsername(jTextFieldEmail.getText());
+        KAppData.getInstance().setPassword(new String(jPasswordField.getPassword()));
         try {
-            KAppData.save(KAppData.instance);
+            KAppData.save();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -431,16 +431,16 @@ public class KApp extends javax.swing.JFrame {
                 String newPath = jfc.getSelectedFile().getAbsolutePath();
 
                 // Move 'Kotak' to new path
-                String folderName = KAppData.instance.getWorkingFolderName();
+                String folderName = KAppData.getInstance().getWorkingFolderName();
                 KLogger.writeln("Move " + folderName + " from " + oldPath + " to " + newPath);
                 KFileSystem.move(folderName, oldPath, newPath);
 
                 // Set new Folder Path
-                KAppData.instance.setWorkingFolderPath(newPath);
+                KAppData.getInstance().setWorkingFolderPath(newPath);
                 jTextFieldFolder.setText(newPath);
 
                 // Save
-                KAppData.save(KAppData.instance);
+                KAppData.save();
             } catch (IOException ex) {
                 Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SecurityException ex) {
@@ -458,12 +458,12 @@ public class KApp extends javax.swing.JFrame {
         String newPort = jTextFieldPort.getText();
 
         // Set to KAppData
-        KAppData.instance.setServerURL(newURL);
-        KAppData.instance.setServerPort(Integer.parseInt(newPort));
+        KAppData.getInstance().setServerURL(newURL);
+        KAppData.getInstance().setServerPort(Integer.parseInt(newPort));
 
         // Save
         try {
-            KAppData.save(KAppData.instance);
+            KAppData.save();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(KApp.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -511,12 +511,12 @@ public class KApp extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     public void init() {
-        jTextFieldFolder.setText(KAppData.instance.getWorkingFolderPath());
-        jTextFieldURL.setText(KAppData.instance.getServerURL());
-        jTextFieldPort.setText(String.valueOf(KAppData.instance.getServerPort()));
-        jTextFieldEmail.setText(KAppData.instance.getEmail());
-        jPasswordField.setText(KAppData.instance.getPassword());
-        login = KAppData.instance.isLogin();
+        jTextFieldFolder.setText(KAppData.getInstance().getWorkingFolderPath());
+        jTextFieldURL.setText(KAppData.getInstance().getServerURL());
+        jTextFieldPort.setText(String.valueOf(KAppData.getInstance().getServerPort()));
+        jTextFieldEmail.setText(KAppData.getInstance().getEmail());
+        jPasswordField.setText(KAppData.getInstance().getPassword());
+        login = KAppData.getInstance().isLogin();
 
         // Render panel accout
         renderAccount();
@@ -528,7 +528,7 @@ public class KApp extends javax.swing.JFrame {
     private void initDaemon() {
         if (login) {
             // Create Daemon
-            daemon = new KDaemon(KAppData.instance.getEmail(), KAppData.instance.getPassword());
+            daemon = new KDaemon(KAppData.getInstance().getEmail(), KAppData.getInstance().getPassword());
 
             // Start Daemon
             //daemon.start();

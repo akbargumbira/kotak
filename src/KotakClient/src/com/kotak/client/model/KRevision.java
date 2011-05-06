@@ -17,21 +17,18 @@ public class KRevision {
     private static String filePath = "";
     
     private static void init() throws FileNotFoundException, IOException, ClassNotFoundException {
-        KAppData.load();
-        filePath = KAppData.instance.getRepoPath() + "/" + fileName;
+        filePath = KAppData.getInstance().getRepoPath() + "/" + fileName;
     }
     
     public static void setRevision(int number) throws FileNotFoundException, IOException, ClassNotFoundException {
-        if (number > 0) {
+        if (number >= 0) {
             init();
             
             File file = new File(filePath);
-            if (file.exists()) {
-                FileOutputStream fos = new FileOutputStream(file);
-                DataOutputStream dos = new DataOutputStream(fos);
-                dos.writeInt(number);
-                dos.close();
-            }
+            FileOutputStream fos = new FileOutputStream(file);
+            DataOutputStream dos = new DataOutputStream(fos);
+            dos.writeInt(number);
+            dos.close();
             
         }
     }
@@ -41,12 +38,8 @@ public class KRevision {
         
         File file = new File(filePath);
         
-        if (file.exists()) {
-            FileInputStream fis = new FileInputStream(file);
-            DataInputStream dis = new DataInputStream(fis);
-            return dis.readInt();
-        }
-        
-        return 0;
+        FileInputStream fis = new FileInputStream(file);
+        DataInputStream dis = new DataInputStream(fis);
+        return dis.readInt();
     }
 }

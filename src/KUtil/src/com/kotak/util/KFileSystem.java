@@ -123,12 +123,11 @@ public class KFileSystem {
      */
     public static void save(String path, byte[] content) throws FileNotFoundException, IOException {
         File file = new File(path);
+        File parent = file.getParentFile();
         
-        if (!file.exists()) {
-            if(!file.createNewFile()) {
-                throw new IOException("Can't create file " + path);
-            }
-        }
+        if (parent != null) {
+            parent.mkdirs();
+        }        
         
         FileOutputStream fos = new FileOutputStream(file, false);
         fos.write(content);
@@ -159,13 +158,15 @@ public class KFileSystem {
 
     public static void main(String[] args) {
         try {
-            move("tes", "D:/Rezan/Informatika/Kuliah/Semester 6/2010-2011/Pemograman Internet/Tugas/", "C:/Users/user/Desktop/");
+            byte[] a = {'a'};
+            byte[] b = {'b'};
+            save("rezan/hai/ho/test.txt", a);
+            save("rezan/hai/ho/cuh.txt", a);
+            save("rezan/hai/cuh.txt", b);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(KFileSystem.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(KFileSystem.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(KFileSystem.class.getName()).log(Level.ALL, null, ex);
-        } catch (Exception ex) {
-            Logger.getLogger(KFileSystem.class.getName()).log(Level.ALL, null, ex);
         }
     }
 }

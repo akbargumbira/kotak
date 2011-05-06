@@ -18,7 +18,7 @@ public class FileSystemServer {
         String filePath = ServerData.baseURL+"/"+repository;
         
         for (int i = rev_num; i > 0; --i) {
-            File res = new File(filePath + "/r" + rev_num + "/" + path);
+            File res = new File(filePath + "/r" + i + "/" + path);
             if (res.exists()) {
                 FileInputStream in = new FileInputStream(res);
                 byte[] bytes = new byte[(int)res.length()];

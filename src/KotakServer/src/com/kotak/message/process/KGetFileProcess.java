@@ -59,7 +59,7 @@ public class KGetFileProcess extends KMessageProcess {
                         byte[] fileBytes = fsServer.getFileContent(email, revision, path);
 
                         if (fileBytes != null) { //file not null
-                            sb.append("success ").append(fileBytes);
+                            sb.append("success ").append(new String(fileBytes));
                             response = sb.toString();
                         } else { //fie content is null
                             sb.append("failed filecontent_is_null");

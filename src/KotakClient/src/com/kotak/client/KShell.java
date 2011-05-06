@@ -11,8 +11,8 @@ import com.kotak.message.model.KDelete;
 import com.kotak.message.model.KGetFile;
 import com.kotak.message.model.KMessage;
 import com.kotak.protocol.transfer.KTPClient;
+import com.kotak.util.KFile;
 import com.kotak.util.KFileSystem;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
@@ -33,43 +33,73 @@ public class KShell {
     int port;
 
     public void run() {
-        while (true) {
-            in = new Scanner(System.in);
+        command = "";
+        in = new Scanner(System.in);
+
+        boolean finish = false;
+        while (!finish) {
+            System.out.println("message | sync");
+            command = in.nextLine();
+            if ("message".equals(command)) {
+                shellMessage();
+            } else if ("sync".equals(command)) {
+                shellSync();
+            } else if ("break".equals(command)) {
+                finish = true;
+            }
+        }
+    }
+
+    public void shellSync() {
+        new KDaemon(KAppData.getInstance().getEmail(), KAppData.getInstance().getPassword()).start();
+    }
+
+    public void shellMessage() {
+        System.out.println("Shell Message");
+        boolean finish = false;
+        while (!finish) {
             command = "";
 
             try {
-                KAppData.instance = (KAppData) KAppData.load();
-                URL = KAppData.instance.getServerURL();
-                port = KAppData.instance.getServerPort();
+                URL = KAppData.getInstance().getServerURL();
+                port = KAppData.getInstance().getServerPort();
                 ktp = new KTPClient();
                 KMessage message = null;
+                command = in.nextLine();
+                String[] part = command.split("  *");
 
-                while (true) {
-                    command = in.nextLine();
-                    String[] part = command.split("  *");
-
-                    if (part.length < 1) {
-                        continue;
-                    }
-
-                    String action = part[0];
-
-                    if (action.equals("check") && part.length == 4) {
-                        message = new KCheck(part[1], part[2], Integer.parseInt(part[3]));
-                    } else if (action.equals("getfile") && part.length == 5) {
-                        message = new KGetFile(part[1], part[2], part[3], Integer.parseInt(part[4]));
-                    } else if (action.equals("addfile") && part.length == 5) {
-                        byte[] bytes = KFileSystem.open(KAppData.instance.getRepoPath() + "/" + part[4]);
-                        message = new KAddFile(part[1], part[2], Integer.parseInt(part[3]), part[4], bytes);
-                    } else if (action.equals("delete") && part.length == 5) {
-                        message = new KDelete(part[1], part[2], part[3], Integer.parseInt(part[4]));
-                    } else {
-                        throw new Exception("Command Not found");
-                    }
-
-                    response = ktp.sendRequest(URL, port, message);
-                    System.out.println("response : " + response);
+                if (part.length < 1) {
+                    continue;
                 }
+
+                String action = part[0];
+
+                if (action.equals("check") && part.length == 4) {
+                    message = new KCheck(part[1], part[2], Integer.parseInt(part[3]));
+                } else if (action.equals("getfile") && part.length == 5) {
+                    message = new KGetFile(part[1], part[2], part[3], Integer.parseInt(part[4]));
+                } else if (action.equals("addfile") && part.length == 5) {
+                    byte[] bytes = KFileSystem.open(KAppData.getInstance().getRepoPath() + "/" + part[4]);
+                    message = new KAddFile(part[1], part[2], Integer.parseInt(part[3]), part[4], bytes);
+                } else if (action.equals("delete") && part.length == 5) {
+                    message = new KDelete(part[1], part[2], part[3], Integer.parseInt(part[4]));
+                } else if (action.equals("break")) {
+                    finish = true;
+                    break;
+                } else {
+                    throw new Exception("Command Not found");
+                }
+
+                response = ktp.sendRequest(URL, port, message);
+                System.out.println("response : " + response);
+
+                if ("check".equals(action)) {
+                    String partRes[] = response.split(" ", 4);
+                    if (partRes.length == 4) {
+                        System.out.println(KFile.fromJSONString(partRes[3]).getTree());
+                    }
+                }
+
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(KShell.class.getName()).log(Level.SEVERE, null, ex);
