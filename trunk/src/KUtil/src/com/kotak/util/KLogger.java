@@ -19,10 +19,15 @@ import java.util.logging.Level;
 public class KLogger {
 
     public static String fileName = "log.txt";
+    public static int maxChar = 1000;
     //public static
 
     public static void writeln(String string){
         try {
+            if (string.length() > maxChar) {
+                string = string.substring(0, maxChar);
+            }
+            
             // Write to file
             FileOutputStream fos = new FileOutputStream(fileName, true);
             fos.write((new Date()).toString().getBytes());

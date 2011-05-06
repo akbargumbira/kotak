@@ -87,6 +87,9 @@ public class KAddFileProcess extends KMessageProcess {
                         //Find file to add in the last structure
                         KFile fileUpdated = fileStructure.findFile(path);
                         String structureUpdated;
+                        
+                        // Modified
+                        Date modified = new Date(new File(ServerData.baseURL + "/" + email).lastModified());
 
                         //if file exist then it must be updated
                         // if file not exist then it must be added
@@ -97,6 +100,7 @@ public class KAddFileProcess extends KMessageProcess {
                             //Get structure update from new structure :
                             structureUpdated = KFile.toJSON(fileStructure);
                         } else { //new file must be added
+                            
                             //Parse path to get fileName then Parent
                             String[] part = path.split("/");
 
@@ -104,14 +108,19 @@ public class KAddFileProcess extends KMessageProcess {
                             String fileName = part[part.length - 1];
 
                             //Create new file named fileName 
-                            KFile fileAdded = new KFile(fileName, new Date(new File(ServerData.baseURL + "/" + email).lastModified()));
+                            KFile fileAdded = new KFile(fileName, modified, true);
 
-                            //add file logically in structure
-                            String parentPath = path.replace("/" + fileName, "");
+                            //Add file logically in structure
+                            String parentPath = KFile.getParentPath(path);
                             if (parentPath == null ? path == null : parentPath.equals(path)) {
                                 fileStructure.addFile(fileAdded);
                             } else {
-                                fileStructure.findFile(parentPath).addFile(fileAdded);
+                                KFile parentFile = fileStructure.findFile(parentPath);
+                                if (parentFile == null) {
+                                    fileStructure.mkdirs(parentPath, fileAdded.getModified());
+                                    parentFile = fileStructure.findFile(parentPath);
+                                    parentFile.addFile(fileAdded);
+                                }
                             }
 
                             //Update structure :
@@ -129,7 +138,7 @@ public class KAddFileProcess extends KMessageProcess {
 
                         //Execute insert query :
                         if (qM.INSERT(queryInsert) == 1) { //insert is succesfull
-                            sb.append("success ").append(last_revision + 1);
+                            sb.append("success ").append(last_revision + 1).append(" ").append(modified);
                             response = sb.toString();
                         } else { //insert is not succesfull
                             sb.append("failed add_failed");

@@ -13,6 +13,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,6 +22,51 @@ import java.util.ArrayList;
  */
 public class KAppData implements Serializable {
     private static String fileName = ".kotak";
+
+    /**
+     * @return the instance
+     */
+    public static KAppData getInstance() {        
+        if (instance == null) {
+            try {
+                load();
+            } catch (FileNotFoundException ex) {
+                try {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex);
+                    instance = new KAppData();
+                    KAppData.save();
+                } catch (FileNotFoundException ex1) {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (IOException ex1) {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+            } catch (IOException ex) {
+                try {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex);
+                    instance = new KAppData();
+                    KAppData.save();
+                } catch (FileNotFoundException ex1) {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (IOException ex1) {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+                Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                try {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex);
+                    instance = new KAppData();
+                    KAppData.save();
+                } catch (FileNotFoundException ex1) {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (IOException ex1) {
+                    Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+                Logger.getLogger(KAppData.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return instance;
+    }
     private String serverURL = "127.0.0.1";
     private int serverPort = 10000;
     private String workingFolderPath = "";
@@ -29,7 +76,7 @@ public class KAppData implements Serializable {
     private String password;
     
     private ArrayList<KRepository> repositories;
-    public static KAppData instance;
+    private static KAppData instance;
     private boolean login = false;
 
     public KAppData() {
@@ -48,11 +95,13 @@ public class KAppData implements Serializable {
         return instance;
     }
 
-    public static void save(KAppData data) throws FileNotFoundException, IOException {
-        FileOutputStream fos = new FileOutputStream(fileName);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(data);
-        oos.close();
+    public static void save() throws FileNotFoundException, IOException {
+        if (instance != null) {
+            FileOutputStream fos = new FileOutputStream(fileName);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(instance);
+            oos.close();
+        }
     }
 
     /**

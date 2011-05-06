@@ -5,17 +5,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class KFile extends KFileJSON {
     
     private KFile parent;
 
-    public KFile(String name, Date modified) {
+    public KFile(String name, Date modified, boolean isFile) {
         this.name = name;
         this.lastModified = modified;
+        this.isFile = isFile;
         this.parent = null;
     }
 
@@ -95,7 +97,23 @@ public class KFile extends KFileJSON {
         file.parent = this;
         
         // Modified Recursive
-        file.modifiedRecursive(lastModified);
+        file.modifiedRecursive(file.lastModified);
+    }
+    
+    public void mkdirs(String path, Date date) {
+        String[] part = path.split("/", 2);
+        KFile find = findFile(part[0]);
+        if (find != null) {
+            find.lastModified = date;
+        } else {
+            KFile newFile = new KFile(part[0], date, false);
+            addFile(newFile);
+            find = newFile;
+        }
+        
+        if (part.length == 2) {
+            find.mkdirs(part[1], date);
+        }
     }
     
     /**
@@ -173,7 +191,7 @@ public class KFile extends KFileJSON {
      * @return 
      */
     public static KFile toKFile(KFileJSON fileJSON) {
-        KFile file = new KFile(fileJSON.name, fileJSON.lastModified);
+        KFile file = new KFile(fileJSON.name, fileJSON.lastModified, fileJSON.isFile);
         LinkedList<KFileJSON> files = fileJSON.files;
         
         for (KFileJSON temp : files) {
@@ -211,5 +229,41 @@ public class KFile extends KFileJSON {
         }
         
         parent.modifiedRecursive(date);
+    }
+    
+    public boolean isFile() {
+        return isFile;
+    }
+    
+    public boolean isDir() {
+        return !isFile;
+    }
+    
+    public static String getParentPath(String path) {
+        String parentPath = path.replaceAll("//*[^/]*$", "");     
+        
+        if(parentPath == null ? path == null : parentPath.equals(path)) {
+            return null;
+        }
+        
+        return parentPath;
+    }
+    
+    public static void main(String[] args) {
+        try {
+            System.out.println(new Date());
+            Thread.sleep(1000);
+            KFile file = new KFile("rezanachmad@gmail.com", new Date(), false);
+            Thread.sleep(1000);
+            file.addFile(new KFile("r", new Date(), true));
+            Thread.sleep(1000);
+            file.mkdirs("hai/tesaja", new Date());
+            Thread.sleep(1000);
+            file.findFile("hai/tesaja").addFile(new KFile("he", new Date(), true));
+            System.out.println(file.toJSON());
+            System.out.println(file.getTree());
+        } catch (InterruptedException ex) {
+            Logger.getLogger(KFile.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
